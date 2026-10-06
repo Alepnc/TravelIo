@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/* ───────── Design token ───────── */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand: cobalto elettrico — giovane ma non "portale di prenotazione" */
+  --color-brand-50: #eef0ff;
+  --color-brand-100: #dfe3ff;
+  --color-brand-200: #c1c8ff;
+  --color-brand-300: #96a1ff;
+  --color-brand-400: #6b77ff;
+  --color-brand-500: #4352ff;
+  --color-brand-600: #3140e6;
+  --color-brand-700: #2632b8;
+  --color-brand-800: #1f298f;
+  --color-brand-900: #1b2470;
+
+  /* Accento sole: offerte, risparmi, highlight */
+  --color-sun-100: #fff4cc;
+  --color-sun-300: #ffe07a;
+  --color-sun-400: #ffcf3f;
+  --color-sun-500: #f5b800;
+
+  /* Neutri caldi */
+  --color-ink: #13131c;
+  --color-ink-soft: #3d3d4a;
+  --color-muted: #6e6e7c;
+  --color-line: #e8e6e1;
+  --color-canvas: #faf9f6;
+  --color-surface: #ffffff;
+
+  --color-success: #12a150;
+  --color-danger: #e5484d;
+  --color-warning: #f59e0b;
+
+  --radius-card: 1.25rem;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --shadow-card: 0 1px 2px rgb(19 19 28 / 0.04), 0 8px 24px -12px rgb(19 19 28 / 0.12);
+  --shadow-float: 0 12px 40px -12px rgb(19 19 28 / 0.25);
+
+  --animate-fade-up: fade-up 400ms var(--ease-out) both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/* ───────── Base ───────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  /* Evita lo zoom automatico di iOS sugli input sotto i 16px */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+  @media (min-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: inherit;
+    }
+  }
+  button,
+  [role="button"] {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+}
+
+/* ───────── Utility ───────── */
+@utility press {
+  transition: transform 160ms var(--ease-out);
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+@utility skeleton {
+  background: linear-gradient(90deg, #efede8 0%, #f7f6f2 40%, #efede8 80%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: 0.75rem;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Hover solo su dispositivi con puntatore fine */
+@custom-variant hoverable (@media (hover: hover) and (pointer: fine));
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+  }
+}
+
+/* Leaflet: marker numerati e tile su sfondo coerente */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #eef0ec;
+}
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
+/* Su touch si zooma con le dita: i pulsanti +/- occuperebbero spazio prezioso */
+@media (max-width: 1023px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
+}
