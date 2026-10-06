@@ -6,11 +6,12 @@
  */
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, Polyline, TileLayer, Tooltip, ZoomControl, useMap } from "react-leaflet";
 import type { LatLng } from "@/lib/types";
 import type { MapStop } from "@/lib/itinerary/stops";
 import { CATEGORY_META } from "@/components/itinerary/category";
+import { TILE_ATTRIBUTION, TILE_MAX_ZOOM, TILE_URL } from "./tiles";
 
 export interface MapLayer {
   key: string;
@@ -66,7 +67,13 @@ function FitBounds({ points, fallback }: { points: [number, number][]; fallback:
   return null;
 }
 
+/** Se lo sfondo non carica nemmeno una tile dopo qualche errore, lo diciamo: i punti restano comunque sulla mappa. */
+const TILE_ERROR_THRESHOLD = 4;
+
 export default function TripMap({ layers, hotel, center, activeIds, onSelect }: { layers: MapLayer[]; hotel: { name: string; location: LatLng } | null; center: LatLng; activeIds: Set<string>; onSelect: (activityId: string) => void }) {
+  const [tilesFailed, setTilesFailed] = useState(false);
+  const tileState = useRef({ loaded: 0, errors: 0 });
+
   const fitPoints = useMemo(() => {
     const visible = layers.filter((l) => !l.dimmed);
     // Escursioni lontane (aeroporto, gite) non devono "zoomare fuori" tutta la città
@@ -75,13 +82,23 @@ export default function TripMap({ layers, hotel, center, activeIds, onSelect }: 
   }, [layers, hotel]);
 
   return (
+    <div className="relative h-full w-full">
     <MapContainer center={[center.lat, center.lng]} zoom={13} scrollWheelZoom zoomControl={false} className="h-full w-full" attributionControl>
       <ZoomControl position="bottomright" />
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-        subdomains="abcd"
-        maxZoom={19}
+        url={TILE_URL}
+        attribution={TILE_ATTRIBUTION}
+        maxZoom={TILE_MAX_ZOOM}
+        eventHandlers={{
+          tileload: () => {
+            tileState.current.loaded++;
+            setTilesFailed(false);
+          },
+          tileerror: () => {
+            tileState.current.errors++;
+            if (tileState.current.loaded === 0 && tileState.current.errors >= TILE_ERROR_THRESHOLD) setTilesFailed(true);
+          },
+        }}
       />
       <FitBounds points={fitPoints} fallback={center} />
       {hotel && (
@@ -113,5 +130,13 @@ export default function TripMap({ layers, hotel, center, activeIds, onSelect }: 
         </Fragment>
       ))}
     </MapContainer>
+    {tilesFailed && (
+      <div role="status" className="pointer-events-none absolute left-3 right-3 top-16 z-[500] rounded-2xl bg-surface/95 p-3 text-xs text-ink-soft shadow-md lg:right-auto lg:max-w-xs">
+        <p className="font-semibold text-ink">Lo sfondo della mappa non si carica</p>
+        <p className="mt-0.5">Il servizio delle mappe non risponde o richiede una chiave. I punti dell&apos;itinerario restano visibili.</p>
+        {process.env.NODE_ENV !== "production" && <p className="mt-1 text-muted">Sviluppo: vedi NEXT_PUBLIC_MAP_TILE_URL in .env.example.</p>}
+      </div>
+    )}
+    </div>
   );
 }

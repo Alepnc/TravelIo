@@ -20,7 +20,7 @@ Analisi di prodotto, user journey, schema dati, API, rischi e roadmap: **[docs/A
 | Bozza senza account | Le selezioni restano nel browser; il login serve solo per salvare |
 | Viaggi | Creazione, modifica, duplica, elimina, stati (Pianificazione, Confermato, In corso, Completato), partecipanti |
 | Itinerario | Generazione automatica (voli, check-in/out, orari di apertura, distanze, ritmo, budget, interessi), drag & drop anche tra giorni, modifica, aggiunta, rigenera singola giornata. Le modifiche manuali non vengono sovrascritte |
-| Mappa | Leaflet + OpenStreetMap, tappe numerate nell'ordine del giorno, sincronizzata con la lista, vista "tutti i giorni" |
+| Mappa | Leaflet + sfondo OpenStreetMap (nessuna chiave; configurabile con `NEXT_PUBLIC_MAP_TILE_URL`), tappe numerate nell'ordine del giorno, sincronizzata con la lista, vista "tutti i giorni" |
 | Budget | Previsto/effettivo, per persona, media giornaliera, avviso di sforamento, registro spese |
 | Travel Optimizer | Date più convenienti, volo o alloggio più economico vicino, attività da spostare per ridurre gli spostamenti; si applica con un clic |
 | Assistente AI | Contestuale al viaggio e al giorno aperto; propone operazioni tipizzate che l'utente approva. Claude se `ANTHROPIC_API_KEY` è impostata, altrimenti motore a regole (demo) |
@@ -148,6 +148,10 @@ tramite il loro id (il prezzo non arriva mai dal client) e i link di prenotazion
   (`npm run check:providers`); se SerpApi cambia i campi, il parsing segnala "formato inatteso" invece di mostrare liste vuote.
 - **Link di prenotazione**: Google restituisce per i voli una richiesta POST verso il venditore; l'app la invia con un form
   in una nuova scheda. I riferimenti salvati nei viaggi possono scadere: in quel caso va ripetuta la ricerca.
+- **Sfondo della mappa**: di default OpenStreetMap, che non richiede chiavi ma ammette solo un uso leggero
+  ([policy](https://operations.osmfoundation.org/policies/tiles/)). Con più traffico usa un fornitore di tile
+  (MapTiler, Stadia Maps…) impostando `NEXT_PUBLIC_MAP_TILE_URL` e `NEXT_PUBLIC_MAP_ATTRIBUTION` in `.env.local`.
+  Se lo sfondo non carica, la mappa lo segnala e mostra comunque i punti dell'itinerario.
 - **Foto degli alloggi**: provengono dagli host di Google e si caricano con `<img>` (non `next/image`, perché gli host variano).
 - **Attività e destinazioni**: catalogo curato di 20 mete con poche decine di punti di interesse; un `ActivityProvider`
   reale (Google Places, OpenTripMap) è il prossimo passo naturale.
