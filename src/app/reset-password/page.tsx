@@ -13,7 +13,7 @@ export default async function ResetPage({ searchParams }: PageProps<"/reset-pass
       {typeof token === "string" && token.length >= 20 ? (
         <ResetForm token={token} />
       ) : (
-        <ErrorState title="Link non valido" description="Il link è incompleto o scaduto." action={<Link href="/password-dimenticata" className="font-semibold text-brand-600">Richiedine uno nuovo</Link>} />
+        <ErrorState title="Link non valido" description="Il link è incompleto o scaduto." action={<Link href="/password-dimenticata" className="font-semibold text-ink underline underline-offset-4">Richiedine uno nuovo</Link>} />
       )}
     </AuthShell>
   );

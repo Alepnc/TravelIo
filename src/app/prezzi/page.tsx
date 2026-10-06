@@ -1,13 +1,12 @@
-import { DataSourceBadge } from "@/components/ui/data-source-badge";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PricedGrid, PricedGridSkeleton } from "@/components/discovery/priced-grid";
 import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/ui/misc";
+import { MonthTabs } from "@/components/discovery/month-tabs";
 import { listDestinations } from "@/server/services/discovery";
 import { getSearchOptions } from "@/server/services/options";
-import { monthName } from "@/lib/time";
 import { cn } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Prezzi", description: "Le mete più economiche mese per mese dal tuo aeroporto." };
@@ -31,47 +30,42 @@ export default async function PricesPage({ searchParams }: PageProps<"/prezzi">)
 
   return (
     <>
-      <Container className="pt-8 sm:pt-12">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-4xl font-extrabold sm:text-5xl">Dove costa meno andare</h1>
-          <DataSourceBadge />
+      <Container className="pt-10 sm:pt-14">
+        <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+          <h1 className="text-[2.5rem] font-bold leading-none [font-stretch:75%] sm:text-6xl">Dove costa meno andare</h1>
         </div>
-        <p className="mt-2 max-w-xl text-muted">Prezzo reale del volo A/R per persona, più una stima di alloggio e spese per 4 notti. Scegli mese e tetto di spesa.</p>
+        <p className="mt-3 max-w-xl text-muted">Prezzo reale del volo A/R per persona, più una stima di alloggio e spese per 4 notti. Scegli mese e tetto di spesa.</p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2">
+        <div className="mt-7 flex flex-wrap items-center gap-2">
           <form action="/prezzi" className="flex items-center gap-2">
             <input type="hidden" name="mese" value={month} />
             {max && <input type="hidden" name="max" value={max} />}
-            <label className="text-sm font-medium text-muted" htmlFor="da">
+            <label className="text-sm font-semibold" htmlFor="da">
               Da
             </label>
-            <select id="da" name="da" defaultValue={from} className="h-9 rounded-full border border-line bg-surface px-3 text-sm font-semibold">
+            <select id="da" name="da" defaultValue={from} className="h-10 rounded-md border border-ink/20 bg-surface px-2.5 text-sm font-semibold">
               {options.origins.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
             </select>
-            <button className="press h-9 rounded-full bg-ink px-3 text-sm font-semibold text-white">Aggiorna</button>
+            <button className="press h-10 rounded-md bg-ink px-3.5 text-sm font-semibold text-board-text">Aggiorna</button>
           </form>
-          <span className="mx-1 h-5 w-px bg-line" />
+          <span className="mx-1 hidden h-6 w-px bg-ink/20 sm:block" />
           {CAPS.map((c) => (
-            <Link key={c} href={href({ max: max === c ? undefined : String(c) })} scroll={false} className={cn("rounded-full border px-3.5 py-1.5 text-sm font-semibold", max === c ? "border-ink bg-ink text-white" : "border-line bg-surface")}>
+            <Link key={c} href={href({ max: max === c ? undefined : String(c) })} scroll={false} className={cn("press flex h-10 items-center rounded-md border px-3.5 text-sm font-semibold transition-colors duration-150", max === c ? "border-ink bg-ink text-board-text" : "border-ink/15 bg-surface hoverable:hover:border-ink/50")}>
               Sotto {c} €
             </Link>
           ))}
         </div>
-        <div className="scrollbar-none -mx-4 mt-3 flex gap-1.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-            <Link key={m} href={href({ mese: String(m) })} scroll={false} className={cn("shrink-0 rounded-full px-3 py-1.5 text-sm font-medium", m === month ? "bg-brand-500 text-white" : "text-muted hoverable:hover:bg-ink/5")}>
-              {monthName(m, true)}
-            </Link>
-          ))}
+        <div className="mt-3">
+          <MonthTabs month={month} hrefFor={(m) => href({ mese: String(m) })} />
         </div>
 
         <div className="mt-8">
-          <Suspense key={`${from}-${month}-${max}-${scan}`} fallback={<PricedGridSkeleton />}>
-            <PricedGrid destinations={dests} from={from} month={month} maxPrice={max} ensureKnown={scan} moreHref={href({ n: "12" })} />
+          <Suspense key={`${from}-${month}-${max}-${scan}`} fallback={<PricedGridSkeleton view="board" />}>
+            <PricedGrid destinations={dests} from={from} month={month} maxPrice={max} ensureKnown={scan} moreHref={href({ n: "12" })} view="board" />
           </Suspense>
         </div>
       </Container>

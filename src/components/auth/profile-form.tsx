@@ -8,8 +8,8 @@ import type { SearchOption } from "@/components/search/search-widget";
 import { cn } from "@/lib/format";
 
 const INTERESTS = [
-  ["cultura", "🏛️ Cultura"], ["arte", "🎨 Arte"], ["storia", "📜 Storia"], ["natura", "🌿 Natura"], ["mare", "🏖️ Mare"],
-  ["nightlife", "🎉 Nightlife"], ["cibo", "🍝 Cibo"], ["panorama", "🌅 Panorami"], ["shopping", "🛍️ Shopping"], ["relax", "🧘 Relax"], ["avventura", "🧗 Avventura"],
+  ["cultura", "Cultura"], ["arte", "Arte"], ["storia", "Storia"], ["natura", "Natura"], ["mare", "Mare"],
+  ["nightlife", "Nightlife"], ["cibo", "Cibo"], ["panorama", "Panorami"], ["shopping", "Shopping"], ["relax", "Relax"], ["avventura", "Avventura"],
 ] as const;
 
 export function ProfileForm({ initial, origins }: { initial: { name: string; email: string; homeAirport: string; pace: string; budgetLevel: string; interests: string[] }; origins: SearchOption[] }) {
@@ -17,7 +17,7 @@ export function ProfileForm({ initial, origins }: { initial: { name: string; ema
   return (
     <form action={action} className="space-y-6">
       {state.message && (
-        <p role="status" className={cn("rounded-xl px-3.5 py-2.5 text-sm", state.ok ? "bg-success/10 text-success" : "bg-danger/10 text-danger")}>
+        <p role="status" className={cn("rounded-md px-3.5 py-2.5 text-sm font-medium text-white", state.ok ? "bg-ink" : "bg-danger")}>
           {state.message}
         </p>
       )}
@@ -61,7 +61,7 @@ export function ProfileForm({ initial, origins }: { initial: { name: string; ema
           {INTERESTS.map(([key, label]) => (
             <label key={key} className="cursor-pointer">
               <input type="checkbox" name="interests" value={key} defaultChecked={initial.interests.includes(key)} className="peer sr-only" />
-              <span className="press inline-block rounded-full border border-line bg-surface px-3.5 py-2 text-sm font-medium transition-colors duration-150 peer-checked:border-brand-500 peer-checked:bg-brand-50 peer-checked:text-brand-800 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500">
+              <span className="press inline-block rounded-md border border-ink/15 bg-surface px-3.5 py-2 text-sm font-medium transition-colors duration-150 hoverable:hover:border-ink/50 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-board-text peer-focus-visible:ring-3 peer-focus-visible:ring-brand-500">
                 {label}
               </span>
             </label>

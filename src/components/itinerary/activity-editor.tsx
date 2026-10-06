@@ -51,7 +51,7 @@ function EditorForm({ activity, days, onSave }: { activity: ItineraryActivity; d
 
   return (
     <form onSubmit={submit} className="space-y-4 pt-1">
-      {error && <p className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{error}</p>}
+      {error && <p className="rounded-md bg-danger px-3 py-2 text-sm font-medium text-white" role="alert">{error}</p>}
       <Field label="Titolo" htmlFor="ed-title">
         <Input id="ed-title" value={v.title} onChange={(e) => set("title", e.target.value)} maxLength={120} />
       </Field>
@@ -64,7 +64,7 @@ function EditorForm({ activity, days, onSave }: { activity: ItineraryActivity; d
         </Field>
       </div>
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={v.timeLocked} onChange={(e) => set("timeLocked", e.target.checked)} className="h-4 w-4 accent-brand-500" />
+        <input type="checkbox" checked={v.timeLocked} onChange={(e) => set("timeLocked", e.target.checked)} className="h-4 w-4 accent-ink" />
         Orario fisso (non spostarlo quando riordino)
       </label>
       <div className="grid grid-cols-2 gap-3">
@@ -81,7 +81,7 @@ function EditorForm({ activity, days, onSave }: { activity: ItineraryActivity; d
           <Select id="ed-cat" value={v.category} onChange={(e) => set("category", e.target.value as typeof v.category)}>
             {EDITABLE_CATEGORIES.map((c) => (
               <option key={c} value={c}>
-                {CATEGORY_META[c].emoji} {CATEGORY_META[c].label}
+                {CATEGORY_META[c].label}
               </option>
             ))}
           </Select>

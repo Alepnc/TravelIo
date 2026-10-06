@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Route, Wallet } from "lucide-react";
+import { SquaresFour as LayoutDashboard, Path as Route, Wallet } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/format";
 
 export function TripTabs({ tripId }: { tripId: string }) {
@@ -17,8 +17,16 @@ export function TripTabs({ tripId }: { tripId: string }) {
       {tabs.map((t) => {
         const active = t.exact ? pathname === t.href : pathname.startsWith(t.href);
         return (
-          <Link key={t.href} href={t.href} aria-current={active ? "page" : undefined} className={cn("flex shrink-0 items-center gap-2 border-b-2 px-2.5 py-3 sm:px-3 text-sm font-semibold transition-colors duration-150", active ? "border-brand-500 text-ink" : "border-transparent text-muted hoverable:hover:text-ink")}>
-            <t.icon className="hidden h-4 w-4 sm:block" /> {t.label}
+          <Link
+            key={t.href}
+            href={t.href}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "relative flex shrink-0 items-center gap-2 px-2.5 py-3.5 text-sm font-semibold transition-colors duration-150 after:absolute after:inset-x-2.5 after:bottom-0 after:h-[3px] sm:px-3",
+              active ? "text-ink after:bg-brand-500" : "text-muted after:bg-transparent hoverable:hover:text-ink",
+            )}
+          >
+            <t.icon className="hidden h-4 w-4 sm:block" weight={active ? "fill" : "regular"} /> {t.label}
           </Link>
         );
       })}

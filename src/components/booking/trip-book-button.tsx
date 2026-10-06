@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ArrowSquareOut as ExternalLink } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { BookingSheet } from "./booking-sheet";
 

@@ -1,4 +1,4 @@
-import { Check, MapPin } from "lucide-react";
+import { Check, MapPin } from "@phosphor-icons/react/dist/ssr";
 import type { ReactNode } from "react";
 import type { AccommodationOffer } from "@/lib/types";
 import { CoverImage } from "@/components/ui/cover-image";
@@ -15,14 +15,14 @@ function ratingLabel(r: number) {
 
 export function StayCard({ offer, selected, action, badges = [], compact }: { offer: AccommodationOffer; selected?: boolean; action?: ReactNode; badges?: string[]; compact?: boolean }) {
   return (
-    <article className={cn("flex overflow-hidden rounded-[var(--radius-card)] border bg-surface transition-[border-color,box-shadow] duration-200", compact ? "flex-col" : "flex-col sm:flex-row", selected ? "border-brand-500 shadow-[0_0_0_3px_var(--color-brand-100)]" : "border-line hoverable:hover:shadow-[var(--shadow-card)]")}>
+    <article className={cn("flex overflow-hidden rounded-md border bg-surface transition-[border-color,box-shadow] duration-200", compact ? "flex-col" : "flex-col sm:flex-row", selected ? "border-ink shadow-[0_0_0_1px_var(--color-ink),inset_0_3px_0_var(--color-brand-500)]" : "border-line hoverable:hover:border-ink/40")}>
       <div className={cn("relative shrink-0", compact ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-auto sm:w-64")}>
         <CoverImage src={offer.imageUrl} alt={offer.name} sizes="(min-width: 640px) 256px, 100vw" className="absolute inset-0" />
-        <span className="absolute left-3 top-3 rounded-full bg-surface/95 px-2.5 py-1 text-xs font-bold">{STAY_TYPE_LABEL[offer.type]}</span>
-      </div>
+              </div>
       <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
+            <p className="col-label text-muted">{STAY_TYPE_LABEL[offer.type]}</p>
             <h3 className={cn("text-lg font-bold", compact ? "line-clamp-2 leading-snug" : "truncate")}>{offer.name}</h3>
             <p className="mt-0.5 flex items-center gap-1 text-sm text-muted">
               <MapPin className="h-3.5 w-3.5 shrink-0" /> {offer.neighborhood ? `${offer.neighborhood} · ` : ""}
@@ -35,16 +35,16 @@ export function StayCard({ offer, selected, action, badges = [], compact }: { of
                 <p className="text-xs font-semibold">{ratingLabel(offer.rating)}</p>
                 <p className="text-[11px] text-muted">{formatNumber(offer.reviewsCount)} recensioni</p>
               </div>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-sm font-bold text-white">{offer.rating.toFixed(1)}</span>
+              <span className="tabular flex h-9 w-10 items-center justify-center rounded-sm bg-ink text-sm font-bold text-board-text">{offer.rating.toFixed(1)}</span>
             </div>
           ) : (
-            <span className="shrink-0 rounded-full bg-ink/5 px-2.5 py-1 text-xs font-medium text-muted">Nessuna recensione</span>
+            <span className="shrink-0 rounded-sm bg-ink/[0.06] px-2 py-1 text-xs font-medium text-muted">Nessuna recensione</span>
           )}
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
           {badges.map((b) => (
-            <Badge key={b} tone={b === "Più economico" ? "success" : "brand"}>
+            <Badge key={b} tone={b === "Più economico" ? "success" : "sun"}>
               {b}
             </Badge>
           ))}
@@ -59,7 +59,7 @@ export function StayCard({ offer, selected, action, badges = [], compact }: { of
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-4">
           <div>
-            <p className="font-display text-2xl font-extrabold leading-none">
+            <p className="tabular text-[1.65rem] font-bold leading-none [font-stretch:80%]">
               {formatPrice(offer.pricePerNight)}
               <span className="text-sm font-medium text-muted"> /notte</span>
             </p>
@@ -76,7 +76,7 @@ export function StayCard({ offer, selected, action, badges = [], compact }: { of
 
 export function StayCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface sm:flex-row">
+    <div className="flex flex-col overflow-hidden rounded-md border border-line bg-surface sm:flex-row">
       <div className="skeleton aspect-[16/10] rounded-none sm:aspect-auto sm:h-48 sm:w-64" />
       <div className="flex-1 space-y-3 p-5">
         <div className="skeleton h-5 w-2/3" />

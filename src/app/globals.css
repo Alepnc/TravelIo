@@ -1,57 +1,75 @@
 @import "tailwindcss";
 
-/* ───────── Design token ───────── */
+/* ───────── Design token: tabellone partenze ─────────
+   Atrio chiaro (acciaio freddo) su cui stanno i pannelli del tabellone (nero palette, lettere bianche).
+   L'ambra è l'unica cosa su cui agire; il rosso "soppresso" segnala sforamenti ed errori. */
 @theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand: cobalto elettrico — giovane ma non "portale di prenotazione" */
-  --color-brand-50: #eef0ff;
-  --color-brand-100: #dfe3ff;
-  --color-brand-200: #c1c8ff;
-  --color-brand-300: #96a1ff;
-  --color-brand-400: #6b77ff;
-  --color-brand-500: #4352ff;
-  --color-brand-600: #3140e6;
-  --color-brand-700: #2632b8;
-  --color-brand-800: #1f298f;
-  --color-brand-900: #1b2470;
+  /* Ambra "ritardo": azione primaria, selezione, prezzo da guardare.
+     I gradini 600+ sono per testo su fondo chiaro (contrasto AA). */
+  --color-brand-50: #fff6dc;
+  --color-brand-100: #ffecb0;
+  --color-brand-200: #ffdc7a;
+  --color-brand-300: #ffc840;
+  --color-brand-400: #ffb81a;
+  --color-brand-500: #ffb000;
+  --color-brand-600: #8a5a00;
+  --color-brand-700: #6e4700;
+  --color-brand-800: #533500;
+  --color-brand-900: #3a2500;
 
-  /* Accento sole: offerte, risparmi, highlight */
-  --color-sun-100: #fff4cc;
-  --color-sun-300: #ffe07a;
-  --color-sun-400: #ffcf3f;
-  --color-sun-500: #f5b800;
+  --color-sun-100: #fff6dc;
+  --color-sun-300: #ffc840;
+  --color-sun-400: #ffb000;
+  --color-sun-500: #e59e00;
 
-  /* Neutri caldi */
-  --color-ink: #13131c;
-  --color-ink-soft: #3d3d4a;
-  --color-muted: #6e6e7c;
-  --color-line: #e8e6e1;
-  --color-canvas: #faf9f6;
+  /* Tabellone */
+  --color-board: #0e0f11;
+  --color-board-cell: #191b1f;
+  --color-board-frame: #2a2d31;
+  --color-board-text: #f2f2f0;
+  --color-board-dim: #9a9ea5;
+
+  /* Atrio */
+  --color-ink: #0e0f11;
+  --color-ink-soft: #383b41;
+  --color-muted: #5a5e66;
+  --color-line: #d2d5d8;
+  --color-canvas: #eceeef;
   --color-surface: #ffffff;
+  --color-steel: #a7aaaf;
 
-  --color-success: #12a150;
-  --color-danger: #e5484d;
-  --color-warning: #f59e0b;
+  --color-danger: #c4161c;
+  --color-warning: #ffb000;
 
-  --radius-card: 1.25rem;
+  /* Un solo linguaggio di angoli: 4px, 2px sulle palette */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius-card: 4px;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
-  --shadow-card: 0 1px 2px rgb(19 19 28 / 0.04), 0 8px 24px -12px rgb(19 19 28 / 0.12);
-  --shadow-float: 0 12px 40px -12px rgb(19 19 28 / 0.25);
+  --shadow-card: 0 1px 0 rgb(14 15 17 / 0.06);
+  --shadow-float: 0 1px 0 rgb(14 15 17 / 0.08), 0 20px 44px -18px rgb(14 15 17 / 0.42);
 
-  --animate-fade-up: fade-up 400ms var(--ease-out) both;
+  --animate-fade-up: fade-up 420ms var(--ease-out) both;
   --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-flap: flap 110ms var(--ease-out) both;
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -68,17 +86,30 @@
   }
 }
 
+/* Una palette che cade: la metà superiore arriva dall'alto e si appiattisce sul perno */
+@keyframes flap {
+  from {
+    transform: perspective(240px) rotateX(-70deg);
+    filter: brightness(0.55);
+  }
+  to {
+    transform: perspective(240px) rotateX(0);
+    filter: brightness(1);
+  }
+}
+
 /* ───────── Base ───────── */
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--color-steel) transparent;
   }
   body {
     background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: normal;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -86,16 +117,25 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
   p {
     text-wrap: pretty;
   }
+  ::selection {
+    background: var(--color-brand-500);
+    color: var(--color-ink);
+  }
   :focus-visible {
-    outline: 2px solid var(--color-brand-500);
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
-    border-radius: 6px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 4px var(--color-brand-500);
+  }
+  input,
+  textarea {
+    caret-color: var(--color-brand-600);
   }
   /* Evita lo zoom automatico di iOS sugli input sotto i 16px */
   input,
@@ -115,6 +155,15 @@
     cursor: pointer;
     touch-action: manipulation;
   }
+  a {
+    text-underline-offset: 3px;
+  }
+  /* Prezzi, orari e date si leggono in colonna */
+  table,
+  time,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 /* ───────── Utility ───────── */
@@ -126,10 +175,36 @@
 }
 
 @utility skeleton {
-  background: linear-gradient(90deg, #efede8 0%, #f7f6f2 40%, #efede8 80%);
+  background: linear-gradient(90deg, #dfe2e4 0%, #eceeef 40%, #dfe2e4 80%);
   background-size: 200% 100%;
   animation: var(--animate-shimmer);
-  border-radius: 0.75rem;
+  border-radius: 3px;
+}
+
+@utility skeleton-board {
+  background: linear-gradient(90deg, #191b1f 0%, #24272c 40%, #191b1f 80%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: 2px;
+}
+
+/* Testo da tabellone: maiuscolo condensato, spaziato, cifre in colonna */
+@utility flap {
+  font-family: var(--font-display);
+  font-stretch: 70%;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Etichette di colonna del tabellone */
+@utility col-label {
+  font-stretch: 85%;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 @utility scrollbar-none {
@@ -146,6 +221,51 @@
 /* Hover solo su dispositivi con puntatore fine */
 @custom-variant hoverable (@media (hover: hover) and (pointer: fine));
 
+/* ───────── Celle a palette (FlapText) ───────── */
+@layer components {
+  .flap-cell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.74em;
+    height: 1.08em;
+    letter-spacing: 0;
+    background: var(--color-board-cell);
+    border-radius: 2px;
+    color: var(--color-board-text);
+    line-height: 1;
+    box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.03);
+  }
+  /* Il perno orizzontale a metà palette */
+  .flap-cell::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: 1px;
+    background: rgb(0 0 0 / 0.75);
+  }
+  .flap-cell > span {
+    display: block;
+    transform-origin: 50% 100%;
+  }
+  /* Sotto i 18px il perno taglierebbe le lettere: le celle piccole restano piene */
+  .flap-sm .flap-cell::after {
+    display: none;
+  }
+  /* Pannello del tabellone: cornice d'acciaio con intercapedine */
+  .board-panel {
+    background: var(--color-board);
+    border: 1px solid #3a3d42;
+    border-radius: 4px;
+    box-shadow: 0 0 0 5px var(--color-board-frame);
+  }
+  .flap-cell[data-flip] > span {
+    animation: var(--animate-flap);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -159,7 +279,7 @@
 /* Leaflet: marker numerati e tile su sfondo coerente */
 .leaflet-container {
   font-family: var(--font-sans);
-  background: #eef0ec;
+  background: #e3e6e7;
 }
 .leaflet-div-icon {
   background: transparent;

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, Map, Search, Sparkles, User } from "lucide-react";
+import { Compass, MapTrifold as Map, MagnifyingGlass as Search, Sparkle as Sparkles, User } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/format";
 
 const TABS = [
@@ -19,14 +19,14 @@ export function MobileNav() {
   // Nel builder di itinerario la barra inferiore è dedicata ai controlli del giorno
   if (/^\/viaggi\/[^/]+\/itinerario/.test(pathname)) return null;
   return (
-    <nav className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md md:hidden" aria-label="Navigazione mobile">
-      <ul className="mx-auto flex max-w-md items-stretch justify-around pt-1.5">
+    <nav className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-board-frame bg-board md:hidden" aria-label="Navigazione mobile">
+      <ul className="mx-auto flex max-w-md items-stretch justify-around">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (
             <li key={href}>
-              <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex w-16 flex-col items-center gap-0.5 rounded-xl py-1 text-[11px] font-medium", active ? "text-brand-600" : "text-muted")}>
-                <Icon className={cn("h-5 w-5 transition-transform duration-150", active && "scale-110")} strokeWidth={active ? 2.4 : 2} />
+              <Link href={href} aria-current={active ? "page" : undefined} className={cn("relative flex w-16 flex-col items-center gap-1 pb-1 pt-2.5 text-[11px] font-medium before:absolute before:inset-x-3 before:top-0 before:h-[3px]", active ? "text-brand-500 before:bg-brand-500" : "text-board-dim")}>
+                <Icon className="h-5 w-5" weight={active ? "fill" : "regular"} />
                 {label}
               </Link>
             </li>

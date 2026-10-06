@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { ArrowUp, Check, Sparkles } from "lucide-react";
+import { ArrowUp, Check, Sparkle as Sparkles } from "@phosphor-icons/react/dist/ssr";
 import type { AssistantProposal, AssistantReply } from "@/lib/assistant";
 import type { Itinerary } from "@/lib/types";
 import { Sheet } from "@/components/ui/sheet";
@@ -97,7 +97,7 @@ export function AssistantPanel({ open, onClose, tripId, focusDayId, onItinerary 
     <Sheet
       open={open}
       onClose={onClose}
-      title="✨ Assistente di viaggio"
+      title="Assistente di viaggio"
       className="md:w-[460px]"
       footer={
         <form onSubmit={submit} className="flex items-end gap-2 pb-1">
@@ -117,10 +117,10 @@ export function AssistantPanel({ open, onClose, tripId, focusDayId, onItinerary 
             }}
             placeholder={tripId ? "Chiedi di modificare il viaggio…" : "Dove vuoi andare?"}
             maxLength={1000}
-            className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-line bg-surface px-4 py-2.5 outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+            className="max-h-32 min-h-11 flex-1 resize-none rounded-md border border-ink/20 bg-surface px-3 py-2.5 outline-none focus:border-ink focus:ring-3 focus:ring-brand-500"
           />
-          <button type="submit" disabled={!input.trim() || loading} className="press flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white disabled:opacity-40" aria-label="Invia">
-            <ArrowUp className="h-5 w-5" />
+          <button type="submit" disabled={!input.trim() || loading} className="press flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-brand-500 text-ink disabled:opacity-40" aria-label="Invia">
+            <ArrowUp className="h-5 w-5" weight="bold" />
           </button>
         </form>
       }
@@ -131,7 +131,7 @@ export function AssistantPanel({ open, onClose, tripId, focusDayId, onItinerary 
             <p className="text-sm text-muted">{tripId ? "Conosco il tuo itinerario, il giorno che stai guardando e il tuo budget. Ti propongo modifiche: decidi tu se applicarle." : "Dimmi dove, per quanto e con che budget: preparo io il viaggio."}</p>
             <div className="mt-4 flex flex-col gap-2">
               {prompts.map((p) => (
-                <button key={p} onClick={() => send(p)} className="press rounded-2xl border border-line bg-surface px-4 py-2.5 text-left text-sm font-medium hoverable:hover:border-brand-300">
+                <button key={p} onClick={() => send(p)} className="press rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-left text-sm font-medium hoverable:hover:border-ink/50">
                   {p}
                 </button>
               ))}
@@ -140,18 +140,18 @@ export function AssistantPanel({ open, onClose, tripId, focusDayId, onItinerary 
         )}
         {messages.map((m, i) => (
           <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
-            <div className={cn("max-w-[88%] rounded-2xl px-4 py-2.5 text-sm", m.role === "user" ? "rounded-br-md bg-ink text-white" : "rounded-bl-md bg-ink/5")}>
+            <div className={cn("max-w-[88%] rounded-md px-3.5 py-2.5 text-sm", m.role === "user" ? "bg-ink text-board-text" : "border border-line bg-canvas")}>
               <p className="whitespace-pre-wrap">{m.content}</p>
               {m.proposals && m.proposals.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {m.proposals.map((p) => {
                     const done = m.applied?.includes(p.id);
                     return (
-                      <div key={p.id} className="flex items-center gap-2 rounded-xl bg-surface p-2.5 shadow-sm">
-                        <Sparkles className="h-4 w-4 shrink-0 text-brand-500" />
+                      <div key={p.id} className="flex items-center gap-2 border-t border-line pt-2.5">
+                        <Sparkles className="h-4 w-4 shrink-0" />
                         <span className="flex-1 text-sm font-medium">{p.label}</span>
                         {done ? (
-                          <span className="flex items-center gap-1 text-xs font-semibold text-success">
+                          <span className="flex items-center gap-1 text-xs font-semibold text-ink">
                             <Check className="h-4 w-4" /> Fatto
                           </span>
                         ) : (
@@ -176,7 +176,7 @@ export function AssistantPanel({ open, onClose, tripId, focusDayId, onItinerary 
         {loading && (
           <div className="flex gap-1 px-2 py-3" aria-label="L'assistente sta scrivendo">
             {[0, 1, 2].map((d) => (
-              <span key={d} className="h-2 w-2 animate-bounce rounded-full bg-muted/60" style={{ animationDelay: `${d * 120}ms` }} />
+              <span key={d} className="h-2 w-2 animate-pulse rounded-xs bg-ink/50" style={{ animationDelay: `${d * 120}ms` }} />
             ))}
           </div>
         )}
@@ -188,8 +188,8 @@ export function AssistantPanel({ open, onClose, tripId, focusDayId, onItinerary 
 
 export function AssistantButton({ onClick, className }: { onClick: () => void; className?: string }) {
   return (
-    <button onClick={onClick} className={cn("press flex h-11 items-center gap-2 rounded-full bg-gradient-to-r from-brand-500 to-violet-500 px-4 text-sm font-bold text-white shadow-lg shadow-brand-500/30", className)}>
-      <Sparkles className="h-4 w-4" /> Assistente
+    <button onClick={onClick} className={cn("press flex h-11 items-center gap-2 rounded-md bg-brand-500 px-4 text-sm font-bold text-ink shadow-[var(--shadow-float)] hoverable:hover:bg-brand-300", className)}>
+      <Sparkles className="h-4 w-4" weight="fill" /> Assistente
     </button>
   );
 }

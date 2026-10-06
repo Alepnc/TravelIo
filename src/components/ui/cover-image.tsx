@@ -25,17 +25,9 @@ function isOptimizable(src: string) {
   }
 }
 
-const GRADIENTS = [
-  "from-brand-500 via-brand-400 to-sun-300",
-  "from-sky-500 via-cyan-400 to-emerald-300",
-  "from-rose-500 via-orange-400 to-sun-300",
-  "from-violet-600 via-fuchsia-500 to-rose-300",
-  "from-emerald-600 via-teal-500 to-sky-300",
-];
-
 /**
- * Immagine di copertina con fallback a gradiente: se l'immagine non carica (rete, CDN, id errato)
- * l'utente vede comunque una card curata, mai un'icona rotta.
+ * Immagine di copertina con fallback a pannello del tabellone: se l'immagine non carica (rete, CDN, id errato)
+ * l'utente vede il nome della meta sulla palette nera, mai un'icona rotta.
  */
 export function CoverImage({ src, alt, sizes, priority, className, label }: { src: string; alt: string; sizes: string; priority?: boolean; className?: string; label?: string }) {
   const [failed, setFailed] = useState(false);
@@ -45,12 +37,11 @@ export function CoverImage({ src, alt, sizes, priority, className, label }: { sr
     const img = imgRef.current;
     if (img?.complete && img.naturalWidth === 0) setFailed(true);
   }, []);
-  const gradient = GRADIENTS[(alt.charCodeAt(0) + alt.length) % GRADIENTS.length];
   const showImage = !!src && !failed;
   return (
-    <div className={cn("relative overflow-hidden bg-gradient-to-br", gradient, className)}>
+    <div className={cn("relative overflow-hidden bg-board", className)}>
       {!showImage ? (
-        label && <span className="absolute inset-0 flex items-center justify-center font-display text-3xl font-bold text-white/90">{label}</span>
+        label && <span className="flap absolute inset-0 flex items-end p-4 text-2xl text-board-text">{label}</span>
       ) : isOptimizable(src) ? (
         <Image
           ref={imgRef}

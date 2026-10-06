@@ -11,7 +11,7 @@ export default function ForgotPage() {
       title="Password dimenticata?"
       subtitle="Inserisci la tua email: ti mandiamo un link per sceglierne una nuova."
       footer={
-        <Link href="/accedi" className="font-semibold text-brand-600">
+        <Link href="/accedi" className="font-semibold text-ink underline underline-offset-4">
           Torna all&apos;accesso
         </Link>
       }

@@ -43,3 +43,8 @@ next-env.d.ts
 
 # database locale
 /data
+
+# impeccable: artefatti locali (screenshot di revisione, cache, pagine di decisione)
+.impeccable/review/
+.impeccable/questions/
+.impeccable/hook.cache.json

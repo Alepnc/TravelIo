@@ -10,7 +10,7 @@ import { formatDuration } from "@/lib/time";
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <fieldset className="border-b border-line py-4 last:border-0">
-      <legend className="mb-2.5 pt-1 text-sm font-semibold">{title}</legend>
+      <legend className="col-label mb-2.5 pt-1 text-ink-soft">{title}</legend>
       {children}
     </fieldset>
   );
@@ -18,7 +18,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={active} className={cn("press rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150", active ? "border-ink bg-ink text-white" : "border-line bg-surface hoverable:hover:border-ink/30")}>
+    <button type="button" onClick={onClick} aria-pressed={active} className={cn("press rounded-sm border px-2.5 py-1.5 text-sm font-medium transition-colors duration-150", active ? "border-ink bg-ink text-board-text" : "border-ink/15 bg-surface hoverable:hover:border-ink/50")}>
       {children}
     </button>
   );
@@ -32,7 +32,7 @@ function Range({ label, min, max, step, value, onChange, format }: { label: stri
         <span className="text-muted">{label}</span>
         <span className="font-semibold tabular-nums">{value == null ? "Qualsiasi" : format(current)}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={current} onChange={(e) => onChange(Number(e.target.value) >= max ? null : Number(e.target.value))} className="w-full accent-brand-500" aria-label={label} />
+      <input type="range" min={min} max={max} step={step} value={current} onChange={(e) => onChange(Number(e.target.value) >= max ? null : Number(e.target.value))} className="w-full accent-ink" aria-label={label} />
     </div>
   );
 }
@@ -49,9 +49,9 @@ export function FlightFilterPanel({ offers, value, onChange }: { offers: FlightO
   const baggageKnown = offers.some((o) => o.baggage.cabin !== null || o.baggage.checked !== null);
   const set = (patch: Partial<FlightFilters>) => onChange({ ...value, ...patch });
   const SLOTS: { key: TimeSlot; label: string }[] = [
-    { key: "mattina", label: "🌅 Mattina" },
-    { key: "pomeriggio", label: "☀️ Pomeriggio" },
-    { key: "sera", label: "🌙 Sera" },
+    { key: "mattina", label: "Mattina" },
+    { key: "pomeriggio", label: "Pomeriggio" },
+    { key: "sera", label: "Sera" },
   ];
   return (
     <div>

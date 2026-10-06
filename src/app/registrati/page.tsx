@@ -18,7 +18,7 @@ export default async function RegisterPage({ searchParams }: PageProps<"/registr
       footer={
         <>
           Hai già un account?{" "}
-          <Link href={`/accedi${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`} className="font-semibold text-brand-600">
+          <Link href={`/accedi${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`} className="font-semibold text-ink underline underline-offset-4">
             Accedi
           </Link>
         </>

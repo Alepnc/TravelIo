@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Bell, LogOut, Map, User } from "lucide-react";
+import { Bell, SignOut as LogOut, MapTrifold as Map, User } from "@phosphor-icons/react/dist/ssr";
 import { logoutAction } from "@/app/actions/auth";
 import { cn } from "@/lib/format";
 
@@ -30,24 +30,24 @@ function usePopover() {
   return { open, setOpen, ref };
 }
 
-const panel = "absolute right-0 top-12 z-50 w-80 origin-top-right rounded-2xl border border-line bg-surface p-2 shadow-[var(--shadow-float)] transition-[opacity,transform] duration-150 ease-[var(--ease-out)] starting:scale-95 starting:opacity-0";
+const panel = "absolute right-0 top-12 z-50 w-80 origin-top-right rounded-md border border-ink/15 bg-surface p-1.5 text-ink shadow-[var(--shadow-float)] transition-[opacity,transform] duration-150 ease-[var(--ease-out)] starting:scale-95 starting:opacity-0";
 
 export function NotificationsMenu({ items }: { items: AppNotification[] }) {
   const { open, setOpen, ref } = usePopover();
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className="press relative flex h-10 w-10 items-center justify-center rounded-full text-ink-soft hoverable:hover:bg-ink/5" aria-label={`Notifiche (${items.length})`} aria-expanded={open}>
+      <button onClick={() => setOpen(!open)} className="press relative flex h-10 w-10 items-center justify-center rounded-md text-board-text hoverable:hover:bg-white/10" aria-label={`Notifiche (${items.length})`} aria-expanded={open}>
         <Bell className="h-5 w-5" />
-        {items.length > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger ring-2 ring-canvas" />}
+        {items.length > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-brand-500 ring-2 ring-board" />}
       </button>
       {open && (
         <div className={panel} role="menu">
-          <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">Notifiche</p>
+          <p className="col-label px-3 pb-1 pt-2 text-muted">Notifiche</p>
           {items.length === 0 ? (
             <p className="px-3 py-4 text-sm text-muted">Tutto tranquillo. Ti avvisiamo qui quando un viaggio si avvicina.</p>
           ) : (
             items.map((n) => (
-              <Link key={n.id} href={n.href} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2.5 hoverable:hover:bg-ink/5" role="menuitem">
+              <Link key={n.id} href={n.href} onClick={() => setOpen(false)} className="block rounded-sm px-3 py-2.5 hoverable:hover:bg-ink/[0.06]" role="menuitem">
                 <p className="text-sm font-semibold">{n.title}</p>
                 <p className="text-sm text-muted">{n.description}</p>
               </Link>
@@ -62,10 +62,10 @@ export function NotificationsMenu({ items }: { items: AppNotification[] }) {
 export function UserMenu({ name }: { name: string }) {
   const { open, setOpen, ref } = usePopover();
   const initials = name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
-  const item = "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium hoverable:hover:bg-ink/5";
+  const item = "flex w-full items-center gap-2.5 rounded-sm px-3 py-2.5 text-sm font-medium hoverable:hover:bg-ink/[0.06]";
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className="press flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700" aria-label="Menu profilo" aria-expanded={open}>
+      <button onClick={() => setOpen(!open)} className="press flex h-9 w-9 items-center justify-center rounded-md bg-board-frame text-sm font-bold text-board-text hoverable:hover:bg-board-dim/40" aria-label="Menu profilo" aria-expanded={open}>
         {initials}
       </button>
       {open && (

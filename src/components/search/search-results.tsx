@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeftRight, BedDouble, Check, ExternalLink, Plane, SlidersHorizontal } from "lucide-react";
+import { ArrowsLeftRight as ArrowLeftRight, Bed as BedDouble, Check, ArrowSquareOut as ExternalLink, AirplaneTilt as Plane, SlidersHorizontal } from "@phosphor-icons/react/dist/ssr";
 import type { AccommodationOffer, FlightOffer } from "@/lib/types";
 import {
   countActive,
@@ -147,12 +147,12 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
   return (
     <div>
       {/* Tab principali */}
-      <div className="flex items-center gap-2" role="tablist" aria-label="Tipo di risultato">
+      <div className="inline-flex gap-px overflow-hidden rounded-md bg-ink/15 p-px" role="tablist" aria-label="Tipo di risultato">
         {([["voli", "Voli", Plane], ["alloggi", "Alloggi", BedDouble]] as const).map(([key, label, Icon]) => (
-          <button key={key} role="tab" aria-selected={tab === key} onClick={() => setTab(key)} className={cn("press flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors duration-150", tab === key ? "bg-ink text-white" : "bg-surface text-ink-soft ring-1 ring-line hoverable:hover:ring-ink/30")}>
+          <button key={key} role="tab" aria-selected={tab === key} onClick={() => setTab(key)} className={cn("flex h-11 items-center gap-2 px-5 text-sm font-semibold transition-colors duration-150 first:rounded-l-[3px] last:rounded-r-[3px]", tab === key ? "bg-ink text-board-text" : "bg-surface text-ink-soft hoverable:hover:text-ink")}>
             <Icon className="h-4 w-4" /> {label}
-            {key === "voli" && (selectedOut || selectedBack) && <Check className="h-4 w-4 text-sun-400" aria-label="selezionato" />}
-            {key === "alloggi" && selectedStay && <Check className="h-4 w-4 text-sun-400" aria-label="selezionato" />}
+            {key === "voli" && (selectedOut || selectedBack) && <Check className="h-4 w-4 text-brand-500" weight="bold" aria-label="selezionato" />}
+            {key === "alloggi" && selectedStay && <Check className="h-4 w-4 text-brand-500" weight="bold" aria-label="selezionato" />}
           </button>
         ))}
       </div>
@@ -170,11 +170,11 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
       <div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
         {/* Filtri desktop */}
         <aside className="hidden lg:block" aria-label="Filtri">
-          <div className="sticky top-24 rounded-[var(--radius-card)] border border-line bg-surface px-5 py-2">
+          <div className="sticky top-20 border-t border-ink pt-1">
             <div className="flex items-center justify-between pb-1 pt-4">
-              <p className="font-bold">Filtri</p>
+              <p className="text-lg font-bold [font-stretch:85%]">Filtri</p>
               {activeFilters > 0 && (
-                <button onClick={resetFilters} className="text-sm font-semibold text-brand-600">
+                <button onClick={resetFilters} className="text-sm font-semibold underline underline-offset-4">
                   Azzera
                 </button>
               )}
@@ -185,14 +185,14 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
 
         <div className="min-w-0">
           {tab === "voli" && (
-            <div className="mb-4 grid grid-cols-2 gap-1 rounded-2xl bg-ink/5 p-1" role="tablist" aria-label="Tratta">
+            <div className="mb-4 grid grid-cols-2 gap-px overflow-hidden rounded-md bg-board-frame p-px" role="tablist" aria-label="Tratta">
               {(["andata", "ritorno"] as const).map((d) => {
                 const date = d === "andata" ? search.depart : search.ret;
                 const sel = d === "andata" ? selectedOut : selectedBack;
                 return (
-                  <button key={d} role="tab" aria-selected={direction === d} onClick={() => setDirection(d)} className={cn("flex flex-col items-start rounded-xl px-4 py-2 text-left transition-colors duration-150", direction === d ? "bg-surface shadow-sm" : "text-muted")}>
-                    <span className="flex items-center gap-1.5 text-sm font-bold capitalize">
-                      {d} {sel && <Check className="h-4 w-4 text-success" />}
+                  <button key={d} role="tab" aria-selected={direction === d} onClick={() => setDirection(d)} className={cn("flex flex-col items-start px-4 py-2.5 text-left transition-colors duration-150", direction === d ? "bg-board text-board-text shadow-[inset_0_-3px_0_var(--color-brand-500)]" : "bg-board-cell text-board-dim hoverable:hover:text-board-text")}>
+                    <span className="flap flex items-center gap-1.5 text-base">
+                      {d} {sel && <Check className="h-4 w-4 text-brand-500" weight="bold" />}
                     </span>
                     <span className="text-xs">{formatDate(date, { weekday: true })}</span>
                   </button>
@@ -206,7 +206,7 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
               {shown === total ? `${total} risultati` : `${shown} di ${total} risultati`}
             </p>
             <div className="flex items-center gap-2">
-              <button onClick={() => setFiltersOpen(true)} className="press flex h-9 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-sm font-semibold lg:hidden">
+              <button onClick={() => setFiltersOpen(true)} className="press flex h-9 items-center gap-1.5 rounded-md border border-ink/20 bg-surface px-3 text-sm font-semibold lg:hidden">
                 <SlidersHorizontal className="h-4 w-4" /> Filtri{activeFilters ? ` (${activeFilters})` : ""}
               </button>
               <label className="sr-only" htmlFor="sort">
@@ -214,7 +214,7 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
               </label>
               <select
                 id="sort"
-                className="h-9 max-w-48 rounded-full border border-line bg-surface px-3 text-sm font-semibold sm:max-w-none"
+                className="h-9 max-w-48 rounded-md border border-ink/20 bg-surface px-2.5 text-sm font-semibold sm:max-w-none"
                 value={tab === "voli" ? flightSort : staySort}
                 onChange={(e) => (tab === "voli" ? setFlightSort(e.target.value as FlightSort) : setStaySort(e.target.value as StaySort))}
               >
@@ -231,11 +231,11 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
             !flightsLoaded.ok ? (
               <ErrorState title="Non riusciamo a caricare i voli" description={flightsLoaded.error} action={<Button variant="outline" onClick={() => router.refresh()}>Riprova</Button>} />
             ) : flightsLoaded.data.length === 0 ? (
-              <EmptyState icon={<Plane className="h-6 w-6" />} title="Nessun volo trovato" description="Non ci sono voli per questa data. Prova a spostare la partenza di un giorno o a cambiare aeroporto." />
+              <EmptyState icon={<Plane className="h-5 w-5" />} title="Nessun volo trovato" description="Non ci sono voli per questa data. Prova a spostare la partenza di un giorno o a cambiare aeroporto." />
             ) : flightList.length === 0 ? (
-              <EmptyState icon={<SlidersHorizontal className="h-6 w-6" />} title="Nessun volo con questi filtri" description="Allarga i filtri per vedere più opzioni." action={<Button variant="outline" onClick={resetFilters}>Azzera filtri</Button>} />
+              <EmptyState icon={<SlidersHorizontal className="h-5 w-5" />} title="Nessun volo con questi filtri" description="Allarga i filtri per vedere più opzioni." action={<Button variant="outline" onClick={resetFilters}>Azzera filtri</Button>} />
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-2">
                 {flightList.map((o) => {
                   const isSelected = o.id === (direction === "andata" ? selectedOut : selectedBack);
                   return (
@@ -266,11 +266,11 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
           ) : !stays.ok ? (
             <ErrorState title="Non riusciamo a caricare gli alloggi" description={stays.error} action={<Button variant="outline" onClick={() => router.refresh()}>Riprova</Button>} />
           ) : stays.data.length === 0 ? (
-            <EmptyState icon={<BedDouble className="h-6 w-6" />} title="Nessun alloggio disponibile" description="Per queste date non ci sono strutture disponibili. Prova con date diverse." />
+            <EmptyState icon={<BedDouble className="h-5 w-5" />} title="Nessun alloggio disponibile" description="Per queste date non ci sono strutture disponibili. Prova con date diverse." />
           ) : stayList.length === 0 ? (
-            <EmptyState icon={<SlidersHorizontal className="h-6 w-6" />} title="Nessun alloggio con questi filtri" description="Allarga i filtri per vedere più opzioni." action={<Button variant="outline" onClick={resetFilters}>Azzera filtri</Button>} />
+            <EmptyState icon={<SlidersHorizontal className="h-5 w-5" />} title="Nessun alloggio con questi filtri" description="Allarga i filtri per vedere più opzioni." action={<Button variant="outline" onClick={resetFilters}>Azzera filtri</Button>} />
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {stayList.map((s) => {
                 const isSelected = s.id === selectedStay;
                 return (
@@ -321,8 +321,8 @@ export function SearchResults({ search, destinationName, outbound, inbound, stay
       <BookingSheet open={!!booking} onClose={() => setBooking(null)} title={booking?.title ?? ""} request={booking?.request ?? null} />
 
       {tripId && (
-        <div className="mt-8 text-center">
-          <Link href={`/viaggi/${tripId}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
+        <div className="mt-8">
+          <Link href={`/viaggi/${tripId}`} className="inline-flex items-center gap-1.5 text-sm font-semibold underline underline-offset-4">
             <ArrowLeftRight className="h-4 w-4" /> Torna al viaggio
           </Link>
         </div>

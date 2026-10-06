@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react/dist/ssr";
 import { getCurrentUser } from "@/server/auth/session";
 import { listTrips } from "@/server/services/trips";
 import { diffDays, todayISO } from "@/lib/time";
@@ -27,7 +27,7 @@ function notificationsFor(userId: string): AppNotification[] {
     return [
       {
         id: t.id,
-        title: until === 0 ? `${t.name} inizia oggi!` : `Mancano ${until} giorni a ${t.destinationName}`,
+        title: until === 0 ? `${t.name} inizia oggi` : `Mancano ${until} giorni a ${t.destinationName}`,
         description: t.status === "pianificazione" ? "Controlla voli, alloggio e itinerario." : "Dai un'occhiata all'itinerario.",
         href: `/viaggi/${t.id}`,
       },
@@ -38,16 +38,16 @@ function notificationsFor(userId: string): AppNotification[] {
 export async function Navbar() {
   const user = await getCurrentUser();
   return (
-    <header className="sticky top-0 z-40 border-b border-line/60 bg-canvas/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-6">
+    <header className="sticky top-0 z-40 border-b border-board-frame bg-board text-board-text">
+      <div className="mx-auto flex h-14 max-w-[76rem] items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="flex items-center gap-7">
           <Logo />
           <NavLinks links={user ? USER_LINKS : GUEST_LINKS} />
         </div>
         <div className="flex items-center gap-1.5">
           {user ? (
             <>
-              <LinkButton href="/viaggi/nuovo" variant="secondary" size="sm" icon={<Plus className="h-4 w-4" />} className="mr-1 hidden sm:inline-flex">
+              <LinkButton href="/viaggi/nuovo" variant="secondary" size="sm" icon={<Plus className="h-4 w-4" weight="bold" />} className="mr-1 hidden sm:inline-flex">
                 Crea viaggio
               </LinkButton>
               <NotificationsMenu items={notificationsFor(user.id)} />
@@ -55,10 +55,10 @@ export async function Navbar() {
             </>
           ) : (
             <>
-              <LinkButton href="/accedi" variant="ghost" size="sm">
+              <LinkButton href="/accedi" variant="ghost" size="sm" className="text-board-text hoverable:hover:bg-white/10 hoverable:hover:text-white">
                 Accedi
               </LinkButton>
-              <LinkButton href="/viaggi/nuovo" variant="primary" size="sm" icon={<Plus className="h-4 w-4" />} className="hidden sm:inline-flex">
+              <LinkButton href="/viaggi/nuovo" variant="secondary" size="sm" icon={<Plus className="h-4 w-4" weight="bold" />} className="hidden sm:inline-flex">
                 Crea viaggio
               </LinkButton>
             </>

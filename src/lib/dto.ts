@@ -84,8 +84,8 @@ export interface TripDetail extends TripSummary {
 }
 
 export const STATUS_META: Record<TripStatus, { label: string; tone: string }> = {
-  pianificazione: { label: "Pianificazione", tone: "bg-amber-100 text-amber-800" },
-  confermato: { label: "Confermato", tone: "bg-emerald-100 text-emerald-800" },
-  in_corso: { label: "In corso", tone: "bg-sky-100 text-sky-800" },
-  completato: { label: "Completato", tone: "bg-stone-200 text-stone-700" },
+  pianificazione: { label: "Pianificazione", tone: "bg-brand-500 text-ink" },
+  confermato: { label: "Confermato", tone: "bg-ink text-board-text" },
+  in_corso: { label: "In corso", tone: "bg-ink text-brand-500" },
+  completato: { label: "Completato", tone: "bg-ink/10 text-ink-soft" },
 };

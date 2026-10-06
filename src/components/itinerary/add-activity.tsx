@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
-import { Clock, Plus, Search } from "lucide-react";
+import { Clock, Plus, MagnifyingGlass as Search } from "@phosphor-icons/react/dist/ssr";
 import type { ItineraryDay, LatLng, PointOfInterest } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -9,6 +9,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { estimateTravel } from "@/lib/geo";
 import { cn, formatPrice } from "@/lib/format";
 import { formatDuration, fromMinutes, toMinutes } from "@/lib/time";
+import { ACTIVITY_ICON } from "@/components/ui/category-icons";
 import { CATEGORY_META, EDITABLE_CATEGORIES } from "./category";
 import type { ActivityDraft } from "./use-itinerary";
 
@@ -41,9 +42,9 @@ export function AddActivitySheet({ open, onClose, day, pois, usedPoiIds, onAdd }
 
   return (
     <Sheet open={open} onClose={onClose} title={`Aggiungi al giorno ${(day?.dayIndex ?? 0) + 1}`}>
-      <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-ink/5 p-1" role="tablist">
+      <div className="mb-4 grid grid-cols-2 gap-px rounded-md bg-ink/15 p-px" role="tablist">
         {(["suggeriti", "libera"] as const).map((t) => (
-          <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={cn("rounded-lg py-2 text-sm font-semibold", tab === t ? "bg-surface shadow-sm" : "text-muted")}>
+          <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={cn("h-10 text-sm font-semibold first:rounded-l-[3px] last:rounded-r-[3px]", tab === t ? "bg-ink text-board-text" : "bg-surface text-muted hoverable:hover:text-ink")}>
             {t === "suggeriti" ? "Luoghi suggeriti" : "Attività libera"}
           </button>
         ))}
@@ -55,16 +56,16 @@ export function AddActivitySheet({ open, onClose, day, pois, usedPoiIds, onAdd }
             <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Cerca: museo, tramonto, mercato…" className="pl-9" aria-label="Cerca luoghi" />
           </div>
           {suggestions.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">Nessun luogo trovato. Prova &quot;Attività libera&quot;.</p>
+            <p className="py-6 text-sm text-muted">Nessun luogo trovato. Prova &quot;Attività libera&quot;.</p>
           ) : (
             <ul className="space-y-2">
               {suggestions.map(({ p, minutes }) => (
                 <li key={p.id}>
                   <button
                     onClick={() => onAdd({ title: p.name, category: p.category, startTime, durationMin: p.durationMin, placeName: p.name, lat: p.location.lat, lng: p.location.lng, cost: p.cost, notes: p.description, poiId: p.id })}
-                    className="press flex w-full items-start gap-3 rounded-2xl border border-line p-3 text-left hoverable:hover:border-brand-300"
+                    className="press flex w-full items-start gap-3 rounded-md border border-line p-3 text-left hoverable:hover:border-ink/50"
                   >
-                    <span className="text-xl" aria-hidden>{CATEGORY_META[p.category].emoji}</span>
+                    <PoiIcon category={p.category} />
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold">{p.name}</span>
                       <span className="line-clamp-1 block text-xs text-muted">{p.description}</span>
@@ -72,10 +73,10 @@ export function AddActivitySheet({ open, onClose, day, pois, usedPoiIds, onAdd }
                         <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {formatDuration(p.durationMin)}</span>
                         <span>{p.cost ? formatPrice(p.cost) : "Gratis"}</span>
                         <span>{p.opening.open}–{p.opening.close === "23:59" ? "24:00" : p.opening.close}</span>
-                        {minutes != null && <span className="font-semibold text-brand-700">{minutes} min dall&apos;ultima tappa</span>}
+                        {minutes != null && <span className="font-semibold text-ink">{minutes} min dall&apos;ultima tappa</span>}
                       </span>
                     </span>
-                    <Plus className="mt-1 h-5 w-5 shrink-0 text-brand-500" />
+                    <Plus className="mt-1 h-5 w-5 shrink-0" weight="bold" />
                   </button>
                 </li>
               ))}
@@ -122,7 +123,7 @@ function CustomActivityForm({ startTime, anchor, onAdd }: { startTime: string; a
           <Select id="new-cat" value={category} onChange={(e) => setCategory(e.target.value as ActivityDraft["category"])}>
             {EDITABLE_CATEGORIES.map((c) => (
               <option key={c} value={c}>
-                {CATEGORY_META[c].emoji} {CATEGORY_META[c].label}
+                {CATEGORY_META[c].label}
               </option>
             ))}
           </Select>
@@ -139,4 +140,9 @@ function CustomActivityForm({ startTime, anchor, onAdd }: { startTime: string; a
       </Button>
     </form>
   );
+}
+
+function PoiIcon({ category }: { category: keyof typeof CATEGORY_META }) {
+  const Icon = ACTIVITY_ICON[category] ?? ACTIVITY_ICON.altro;
+  return <Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: CATEGORY_META[category].color }} aria-hidden />;
 }

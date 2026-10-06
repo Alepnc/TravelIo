@@ -15,7 +15,7 @@ export default async function NewTripPage({ searchParams }: PageProps<"/viaggi/n
   const iso = (v?: string) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : undefined);
   return (
     <Container className="max-w-2xl pb-24 pt-8 sm:pt-12">
-      <h1 className="text-4xl font-extrabold">Crea il tuo viaggio</h1>
+      <h1 className="text-[2.5rem] font-bold leading-none [font-stretch:75%] sm:text-6xl">Crea il tuo viaggio</h1>
       <p className="mt-2 text-muted">Bastano destinazione e date: voli, alloggio e itinerario li aggiungi quando vuoi.</p>
       <div className="mt-8">
         {(() => {

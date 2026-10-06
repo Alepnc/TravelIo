@@ -10,7 +10,7 @@ export default async function BudgetPage({ params }: PageProps<"/viaggi/[id]/bud
   const { id } = await params;
   const { trip } = await loadTrip(id);
   return (
-    <Container className="grid gap-6 pb-28 pt-6 xl:grid-cols-[1fr_340px]">
+    <Container className="grid gap-10 pb-28 pt-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:gap-12">
       <div className="min-w-0">
         <BudgetTracker trip={trip} />
       </div>

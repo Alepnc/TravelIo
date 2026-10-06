@@ -15,7 +15,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CalendarDays, ChevronDown, Layers, List, Map as MapIcon, Plus, RefreshCw, Route, Wand2 } from "lucide-react";
+import { CalendarDots as CalendarDays, CaretDown as ChevronDown, Stack as Layers, List, MapTrifold as MapIcon, Plus, ArrowsClockwise as RefreshCw, Path as Route, MagicWand as Wand2 } from "@phosphor-icons/react/dist/ssr";
 import type { Itinerary, ItineraryDay, LatLng, PointOfInterest, TripPace } from "@/lib/types";
 import { findConflicts, totalTravel } from "@/lib/itinerary/reflow";
 import { mapStops } from "@/lib/itinerary/stops";
@@ -43,7 +43,7 @@ interface Props {
   hasStay: boolean;
 }
 
-const PACE_LABEL: Record<TripPace, string> = { rilassato: "🌿 Rilassato", bilanciato: "⚖️ Bilanciato", intenso: "⚡ Intenso" };
+const PACE_LABEL: Record<TripPace, string> = { rilassato: "Rilassato", bilanciato: "Bilanciato", intenso: "Intenso" };
 
 function Menu({ label, icon, children, align = "right" }: { label: string; icon: React.ReactNode; children: (close: () => void) => React.ReactNode; align?: "left" | "right" }) {
   const [open, setOpen] = useState(false);
@@ -61,11 +61,11 @@ function Menu({ label, icon, children, align = "right" }: { label: string; icon:
   }, [open]);
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen(!open)} aria-expanded={open} className="press flex h-9 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-sm font-semibold hoverable:hover:border-ink/30">
+      <button onClick={() => setOpen(!open)} aria-expanded={open} className="press flex h-9 items-center gap-1.5 rounded-md border border-ink/20 bg-surface px-3 text-sm font-semibold hoverable:hover:border-ink/50">
         {icon} <span className="hidden sm:inline">{label}</span> <ChevronDown className="h-3.5 w-3.5" />
       </button>
       {open && (
-        <div role="menu" className={cn("absolute top-11 z-40 w-64 rounded-2xl border border-line bg-surface p-1.5 shadow-[var(--shadow-float)] transition-[opacity,transform] duration-150 starting:scale-95 starting:opacity-0", align === "right" ? "right-0 origin-top-right" : "left-0 origin-top-left")}>
+        <div role="menu" className={cn("absolute top-11 z-40 w-64 rounded-md border border-ink/15 bg-surface p-1.5 shadow-[var(--shadow-float)] transition-[opacity,transform] duration-150 starting:scale-95 starting:opacity-0", align === "right" ? "right-0 origin-top-right" : "left-0 origin-top-left")}>
           {children(() => setOpen(false))}
         </div>
       )}
@@ -73,7 +73,7 @@ function Menu({ label, icon, children, align = "right" }: { label: string; icon:
   );
 }
 
-const menuItem = "flex w-full flex-col items-start rounded-xl px-3 py-2 text-left text-sm hoverable:hover:bg-ink/5";
+const menuItem = "flex w-full flex-col items-start rounded-sm px-3 py-2 text-left text-sm hoverable:hover:bg-ink/[0.06]";
 
 function DayPill({ day, active, onClick, color, dragging }: { day: ItineraryDay; active: boolean; onClick: () => void; color: string; dragging: boolean }) {
   const { setNodeRef, isOver } = useDroppable({ id: `day:${day.id}` });
@@ -83,16 +83,16 @@ function DayPill({ day, active, onClick, color, dragging }: { day: ItineraryDay;
       onClick={onClick}
       aria-current={active ? "true" : undefined}
       className={cn(
-        "press flex shrink-0 flex-col items-start rounded-2xl border px-3.5 py-2 text-left transition-[border-color,background-color,transform] duration-150",
-        active ? "border-ink bg-ink text-white" : "border-line bg-surface",
-        dragging && !active && "border-dashed border-brand-300",
-        isOver && !active && "scale-105 border-brand-500 bg-brand-50",
+        "flex shrink-0 flex-col items-start rounded-xs px-3 py-1.5 text-left transition-[background-color,color,box-shadow] duration-150",
+        active ? "bg-board-frame text-board-text shadow-[inset_0_-3px_0_var(--color-brand-500)]" : "bg-board-cell text-board-dim hoverable:hover:text-board-text",
+        dragging && !active && "outline outline-1 -outline-offset-1 outline-dashed outline-board-dim",
+        isOver && !active && "bg-board-frame text-board-text shadow-[inset_0_0_0_2px_var(--color-brand-500)]",
       )}
     >
-      <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide">
-        <span className="h-2 w-2 rounded-full" style={{ background: color }} aria-hidden /> Giorno {day.dayIndex + 1}
+      <span className="flap flex items-center gap-1.5 text-sm">
+        <span className="h-2 w-2 rounded-full ring-1 ring-board-dim" style={{ background: color }} aria-hidden /> Giorno {day.dayIndex + 1}
       </span>
-      <span className={cn("text-xs", active ? "text-white/70" : "text-muted")}>{formatDate(day.date, { weekday: true })}</span>
+      <span className="text-xs opacity-80">{formatDate(day.date, { weekday: true })}</span>
     </button>
   );
 }
@@ -177,14 +177,15 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
   // ───────── Nessun itinerario: invito a generarlo ─────────
   if (!itinerary) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-12 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-brand-50 text-brand-600">
-          <Wand2 className="h-7 w-7" />
+      <div className="mx-auto max-w-[76rem] px-4 py-12 sm:px-6">
+       <div className="max-w-xl">
+        <div className="flex h-12 w-12 items-center justify-center rounded-md bg-ink text-brand-500">
+          <Wand2 className="h-6 w-6" />
         </div>
-        <h2 className="mt-5 text-3xl font-extrabold">Genera il tuo itinerario</h2>
-        <p className="mt-2 text-muted">Organizziamo le giornate per zona, con tempi di spostamento, orari di apertura, pranzo e cena. Poi lo modifichi come preferisci.</p>
+        <h2 className="mt-5 text-4xl font-bold leading-none [font-stretch:78%]">Genera il tuo itinerario</h2>
+        <p className="mt-3 text-muted">Organizziamo le giornate per zona, con tempi di spostamento, orari di apertura, pranzo e cena. Poi lo modifichi come preferisci.</p>
         {(!hasFlights || !hasStay) && (
-          <p className="mx-auto mt-4 max-w-md rounded-2xl bg-sun-100 px-4 py-3 text-sm">
+          <p className="mt-4 max-w-md rounded-md bg-brand-500 px-4 py-3 text-sm font-medium text-ink">
             {!hasFlights && !hasStay ? "Senza voli e alloggio" : !hasFlights ? "Senza voli" : "Senza alloggio"} useremo orari e posizione standard (centro città). Puoi aggiungerli anche dopo e rigenerare.
           </p>
         )}
@@ -192,7 +193,7 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
           <legend className="mb-2 text-sm font-semibold">Che ritmo preferisci?</legend>
           <div className="grid grid-cols-3 gap-2">
             {(Object.keys(PACE_LABEL) as TripPace[]).map((p) => (
-              <button key={p} onClick={() => setGenPace(p)} aria-pressed={genPace === p} className={cn("press rounded-2xl border px-3 py-3 text-sm font-semibold", genPace === p ? "border-brand-500 bg-brand-50" : "border-line bg-surface")}>
+              <button key={p} onClick={() => setGenPace(p)} aria-pressed={genPace === p} className={cn("press rounded-md border px-3 py-3 text-sm font-semibold transition-colors duration-150", genPace === p ? "border-ink bg-ink text-board-text" : "border-ink/15 bg-surface hoverable:hover:border-ink/50")}>
                 {PACE_LABEL[p]}
               </button>
             ))}
@@ -201,6 +202,7 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
         <Button size="lg" variant="secondary" className="mt-6" loading={busy === "generate"} icon={<Wand2 className="h-5 w-5" />} onClick={() => generate({ pace: genPace })}>
           Genera itinerario
         </Button>
+       </div>
       </div>
     );
   }
@@ -212,23 +214,23 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
       <DndContext id="itinerary-dnd" sensors={sensors} collisionDetection={closestCenter} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingId(null)}>
         {/* ───────── Colonna lista ───────── */}
         <div className={cn("min-w-0 pb-36 lg:pb-16", mobileView === "mappa" && "hidden lg:block")}>
-          <div className="sticky top-[7.75rem] z-20 border-b border-line bg-canvas/95 backdrop-blur-md lg:top-[7.9rem]">
-            <div className="scrollbar-none flex gap-2 overflow-x-auto px-4 py-3 sm:px-6" role="tablist" aria-label="Giornate">
+          <div className="sticky top-[6.55rem] z-20 bg-board">
+            <div className="scrollbar-none flex gap-px overflow-x-auto px-4 py-2 sm:px-6" role="tablist" aria-label="Giornate">
               {days.map((d, i) => (
                 <DayPill key={d.id} day={d} active={i === safeIndex} color={DAY_COLORS[i % DAY_COLORS.length]} dragging={!!draggingId} onClick={() => setDayIndex(i)} />
               ))}
             </div>
-            {draggingId && <p className="px-6 pb-2 text-xs font-medium text-brand-700">Rilascia su un altro giorno per spostare l&apos;attività</p>}
+            {draggingId && <p className="px-6 pb-2 text-xs font-semibold text-board-text">Rilascia su un altro giorno per spostare l&apos;attività</p>}
           </div>
 
           {day && (
             <div className="px-4 pt-5 sm:px-6" ref={listRef}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="flex items-center gap-1.5 text-sm font-semibold text-brand-600">
+                  <p className="flex items-center gap-1.5 text-sm font-semibold text-ink-soft">
                     <CalendarDays className="h-4 w-4" /> {formatDate(day.date, { weekday: true, long: true })}
                   </p>
-                  <h2 className="text-2xl font-extrabold">
+                  <h2 className="mt-1 text-2xl font-bold leading-tight [font-stretch:80%] sm:text-3xl">
                     Giorno {day.dayIndex + 1} · {day.title}
                   </h2>
                   <p className="mt-1 flex flex-wrap gap-x-3 text-sm text-muted">
@@ -237,7 +239,7 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
                       <Route className="h-3.5 w-3.5" /> {formatDuration(dayStats.travel)} di spostamenti
                     </span>
                     <span>{formatPrice(dayStats.cost)} a persona</span>
-                    {day.isUserModified && <span className="font-medium text-ink-soft">✎ modificato da te</span>}
+                    {day.isUserModified && <span className="font-semibold text-ink-soft">Modificato da te</span>}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -275,12 +277,15 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
 
               <div className={cn("mt-5 transition-opacity duration-200", (busy === "generate" || busy === `day:${day.id}`) && "pointer-events-none opacity-50")}>
                 {activities.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-dashed border-ink/25 px-5 py-4 text-sm text-muted">
                     Giornata libera. Aggiungi un&apos;attività o chiedi all&apos;assistente.
+                    <Button size="sm" variant="outline" onClick={() => setAdding(true)} icon={<Plus className="h-4 w-4" />}>
+                      Aggiungi
+                    </Button>
                   </div>
                 ) : (
                   <SortableContext items={activities.map((a) => a.id)} strategy={verticalListSortingStrategy}>
-                    <ol className="space-y-0">
+                    <ol className="border-t-2 border-ink">
                       {activities.map((a, i) => {
                         const prev = activities[i - 1];
                         const gap = prev ? toMinutes(a.startTime) - (toMinutes(prev.startTime) + prev.durationMin + (a.travelMinFromPrev ?? 0)) : 0;
@@ -288,7 +293,7 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
                           <li key={a.id} data-activity={a.id}>
                             {i > 0 && (gap >= 75 ? <FreeTimeChip minutes={gap} /> : null)}
                             {i > 0 && <TravelChip minutes={a.travelMinFromPrev ?? 0} />}
-                            {i > 0 && !a.travelMinFromPrev && gap < 75 && <div className="h-2" />}
+                            
                             <SortableActivityCard
                               activity={a}
                               index={i}
@@ -306,10 +311,10 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
                     </ol>
                   </SortableContext>
                 )}
-                <button onClick={() => setAdding(true)} className="press mt-4 hidden w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-3.5 text-sm font-semibold text-muted hoverable:hover:border-brand-400 hoverable:hover:text-brand-600 lg:flex">
+                <button onClick={() => setAdding(true)} className="press mt-4 hidden w-full items-center justify-center gap-2 rounded-md border border-dashed border-ink/25 py-3.5 text-sm font-semibold text-ink-soft hoverable:hover:border-ink hoverable:hover:text-ink lg:flex">
                   <Plus className="h-4 w-4" /> Aggiungi attività
                 </button>
-                <p className="mt-4 hidden text-center text-xs text-muted lg:block">Trascina le attività per riordinarle o rilasciale su un altro giorno. Da tastiera: Spazio per afferrare, frecce per spostare.</p>
+                <p className="mt-4 hidden text-xs text-muted lg:block">Trascina le attività per riordinarle o rilasciale su un altro giorno. Da tastiera: Spazio per afferrare, frecce per spostare.</p>
               </div>
             </div>
           )}
@@ -326,13 +331,13 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
 
       {/* ───────── Colonna mappa ───────── */}
       <div className={cn("relative lg:block", mobileView === "lista" ? "hidden" : "block")}>
-        <div className="sticky top-[7.9rem] h-[calc(100dvh-7.75rem-4.5rem)] lg:h-[calc(100dvh-7.9rem)]">
+        <div className="sticky top-[6.55rem] h-[calc(100dvh-6.55rem-4.5rem)] lg:h-[calc(100dvh-6.55rem)]">
           <LazyTripMap layers={layers} hotel={hotel} center={center} activeIds={new Set(activeId ? [activeId] : [])} onSelect={focusActivity} />
-          <div className="absolute left-3 top-3 z-[500] flex gap-1 rounded-full bg-surface/95 p-1 shadow-md backdrop-blur">
-            <button onClick={() => setAllDaysOnMap(false)} aria-pressed={!allDaysOnMap} className={cn("rounded-full px-3 py-1.5 text-xs font-semibold", !allDaysOnMap ? "bg-ink text-white" : "text-muted")}>
+          <div className="absolute left-3 top-3 z-[500] flex gap-px rounded-md bg-board p-1 shadow-[var(--shadow-float)]">
+            <button onClick={() => setAllDaysOnMap(false)} aria-pressed={!allDaysOnMap} className={cn("flap rounded-xs px-3 py-1.5 text-xs", !allDaysOnMap ? "bg-brand-500 text-ink" : "bg-board-cell text-board-dim hoverable:hover:text-board-text")}>
               Giorno {safeIndex + 1}
             </button>
-            <button onClick={() => setAllDaysOnMap(true)} aria-pressed={allDaysOnMap} className={cn("rounded-full px-3 py-1.5 text-xs font-semibold", allDaysOnMap ? "bg-ink text-white" : "text-muted")}>
+            <button onClick={() => setAllDaysOnMap(true)} aria-pressed={allDaysOnMap} className={cn("flap rounded-xs px-3 py-1.5 text-xs", allDaysOnMap ? "bg-brand-500 text-ink" : "bg-board-cell text-board-dim hoverable:hover:text-board-text")}>
               Tutti i giorni
             </button>
           </div>
@@ -340,8 +345,8 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
             <ol className="scrollbar-none absolute inset-x-3 bottom-3 z-[500] flex gap-2 overflow-x-auto lg:hidden">
               {stops.map((s) => (
                 <li key={s.number}>
-                  <button onClick={() => focusActivity(s.activityIds[0])} className="flex shrink-0 items-center gap-2 rounded-full bg-surface px-3 py-2 text-xs font-semibold shadow-md">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] text-white">{s.number}</span>
+                  <button onClick={() => focusActivity(s.activityIds[0])} className="flex shrink-0 items-center gap-2 rounded-md bg-surface px-3 py-2 text-xs font-semibold shadow-[var(--shadow-float)]">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-xs bg-ink text-[10px] text-board-text">{s.number}</span>
                     <span className="max-w-36 truncate">{s.title}</span>
                   </button>
                 </li>
@@ -352,17 +357,17 @@ export function ItineraryBuilder({ tripId, initial, pois, hotel, center, pace, i
       </div>
 
       {/* ───────── Barra azioni ───────── */}
-      <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 px-3 pt-2 backdrop-blur-md lg:hidden">
+      <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-board-frame bg-board px-3 pt-2 lg:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2">
-          <div className="grid flex-1 grid-cols-2 gap-1 rounded-full bg-ink/5 p-1">
-            <button onClick={() => setMobileView("lista")} aria-pressed={mobileView === "lista"} className={cn("flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold", mobileView === "lista" ? "bg-surface shadow-sm" : "text-muted")}>
+          <div className="grid flex-1 grid-cols-2 gap-px rounded-md bg-board-frame p-px">
+            <button onClick={() => setMobileView("lista")} aria-pressed={mobileView === "lista"} className={cn("flex h-10 items-center justify-center gap-1.5 rounded-[3px] text-sm font-semibold", mobileView === "lista" ? "bg-brand-500 text-ink" : "bg-board-cell text-board-dim")}>
               <List className="h-4 w-4" /> Lista
             </button>
-            <button onClick={() => setMobileView("mappa")} aria-pressed={mobileView === "mappa"} className={cn("flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold", mobileView === "mappa" ? "bg-surface shadow-sm" : "text-muted")}>
+            <button onClick={() => setMobileView("mappa")} aria-pressed={mobileView === "mappa"} className={cn("flex h-10 items-center justify-center gap-1.5 rounded-[3px] text-sm font-semibold", mobileView === "mappa" ? "bg-brand-500 text-ink" : "bg-board-cell text-board-dim")}>
               <MapIcon className="h-4 w-4" /> Mappa
             </button>
           </div>
-          <button onClick={() => setAdding(true)} className="press flex h-11 w-11 items-center justify-center rounded-full bg-ink text-white" aria-label="Aggiungi attività">
+          <button onClick={() => setAdding(true)} className="press flex h-11 w-11 items-center justify-center rounded-md border border-board-frame bg-board-cell text-board-text" aria-label="Aggiungi attività">
             <Plus className="h-5 w-5" />
           </button>
           <AssistantButton onClick={() => setAssistantOpen(true)} className="px-3.5" />

@@ -26,7 +26,7 @@ function numberIcon(n: number, color: string, active: boolean) {
     className: "",
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
-    html: `<div style="width:${size}px;height:${size}px;background:${color};color:#fff;border:3px solid #fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font:700 ${active ? 14 : 12}px/1 Inter Variable,system-ui;box-shadow:0 4px 12px rgb(0 0 0 / .28);transition:transform .15s">${n}</div>`,
+    html: `<div style="width:${size}px;height:${size}px;background:${color};color:#fff;border:2px solid ${active ? "#ffb000" : "#fff"};border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 ${active ? 14 : 12}px/1 'Archivo Variable',system-ui;font-stretch:80%;box-shadow:0 3px 10px rgb(14 15 17 / .3);transition:transform .15s">${n}</div>`,
   });
 }
 
@@ -34,7 +34,7 @@ const hotelIcon = L.divIcon({
   className: "",
   iconSize: [34, 34],
   iconAnchor: [17, 17],
-  html: `<div style="width:34px;height:34px;background:#13131c;border:3px solid #fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px rgb(0 0 0 / .3)">🏨</div>`,
+  html: `<div style="width:34px;height:34px;background:#0e0f11;color:#ffb000;border:2px solid #ffb000;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 15px/1 'Archivo Variable',system-ui;font-stretch:75%;box-shadow:0 3px 10px rgb(14 15 17 / .35)" title="Alloggio">H</div>`,
 });
 
 function FitBounds({ points, fallback }: { points: [number, number][]; fallback: LatLng }) {
@@ -131,7 +131,7 @@ export default function TripMap({ layers, hotel, center, activeIds, onSelect }: 
       ))}
     </MapContainer>
     {tilesFailed && (
-      <div role="status" className="pointer-events-none absolute left-3 right-3 top-16 z-[500] rounded-2xl bg-surface/95 p-3 text-xs text-ink-soft shadow-md lg:right-auto lg:max-w-xs">
+      <div role="status" className="pointer-events-none absolute left-3 right-3 top-16 z-[500] rounded-md bg-surface p-3 text-xs text-ink-soft shadow-[var(--shadow-float)] lg:right-auto lg:max-w-xs">
         <p className="font-semibold text-ink">Lo sfondo della mappa non si carica</p>
         <p className="mt-0.5">Il servizio delle mappe non risponde o richiede una chiave. I punti dell&apos;itinerario restano visibili.</p>
         {process.env.NODE_ENV !== "production" && <p className="mt-1 text-muted">Sviluppo: vedi NEXT_PUBLIC_MAP_TILE_URL in .env.example.</p>}

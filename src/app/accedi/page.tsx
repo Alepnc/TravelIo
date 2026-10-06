@@ -13,12 +13,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/accedi">) 
   if (await getCurrentUser()) redirect(nextPath?.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/viaggi");
   return (
     <AuthShell
-      title="Bentornato 👋"
+      title="Bentornato"
       subtitle={nextPath?.startsWith("/viaggi") ? "Accedi per salvare e ritrovare i tuoi viaggi." : "Accedi per ritrovare i tuoi viaggi."}
       footer={
         <>
           Non hai un account?{" "}
-          <Link href={`/registrati${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`} className="font-semibold text-brand-600">
+          <Link href={`/registrati${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`} className="font-semibold text-ink underline underline-offset-4">
             Registrati gratis
           </Link>
         </>

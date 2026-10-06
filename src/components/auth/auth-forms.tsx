@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeSlash as EyeOff } from "@phosphor-icons/react/dist/ssr";
 import { forgotPasswordAction, loginAction, registerAction, resetPasswordAction } from "@/app/actions/auth";
 import type { FormState } from "@/app/actions/state";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Field, Input } from "@/components/ui/field";
 function FormMessage({ state }: { state: FormState }) {
   if (!state.message) return null;
   return (
-    <p role={state.ok ? "status" : "alert"} className={state.ok ? "rounded-xl bg-success/10 px-3.5 py-2.5 text-sm text-success" : "rounded-xl bg-danger/10 px-3.5 py-2.5 text-sm text-danger"}>
+    <p role={state.ok ? "status" : "alert"} className={state.ok ? "rounded-md bg-ink px-3.5 py-2.5 text-sm font-medium text-board-text" : "rounded-md bg-danger px-3.5 py-2.5 text-sm font-medium text-white"}>
       {state.message}
     </p>
   );
@@ -42,7 +42,7 @@ export function LoginForm({ next }: { next?: string }) {
         <PasswordInput name="password" autoComplete="current-password" invalid={!!state.errors?.password} />
       </Field>
       <div className="text-right">
-        <Link href="/password-dimenticata" className="text-sm font-semibold text-brand-600">
+        <Link href="/password-dimenticata" className="text-sm font-semibold text-ink underline underline-offset-4">
           Password dimenticata?
         </Link>
       </div>
@@ -71,7 +71,7 @@ export function RegisterForm({ next }: { next?: string }) {
       <Button type="submit" className="w-full" size="lg" variant="secondary" loading={pending}>
         Crea account
       </Button>
-      <p className="text-center text-xs text-muted">Creando un account accetti di salvare i tuoi viaggi su TravelIo. Niente spam, promesso.</p>
+      <p className="text-xs text-muted">Creando un account accetti di salvare i tuoi viaggi su TravelIo. Niente spam, promesso.</p>
     </form>
   );
 }

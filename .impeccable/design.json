@@ -1,0 +1,510 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T12:08:53+00:00",
+  "title": "Design System: TravelIo",
+  "extensions": {
+    "colorMeta": {
+      "delay-amber": {
+        "role": "primary",
+        "displayName": "Delay Amber",
+        "canonical": "#ffb000",
+        "tonalRamp": [
+          "#3a2500",
+          "#533500",
+          "#6e4700",
+          "#8a5a00",
+          "#ffb000",
+          "#ffc840",
+          "#ffdc7a",
+          "#fff6dc"
+        ]
+      },
+      "delay-amber-hover": {
+        "role": "primary",
+        "displayName": "Delay Amber Hover",
+        "canonical": "#ffc840",
+        "tonalRamp": [
+          "#3a2500",
+          "#533500",
+          "#6e4700",
+          "#8a5a00",
+          "#ffb000",
+          "#ffc840",
+          "#ffdc7a",
+          "#fff6dc"
+        ]
+      },
+      "delay-amber-wash": {
+        "role": "primary",
+        "displayName": "Amber Wash",
+        "canonical": "#fff6dc",
+        "tonalRamp": [
+          "#3a2500",
+          "#533500",
+          "#6e4700",
+          "#8a5a00",
+          "#ffb000",
+          "#ffc840",
+          "#ffecb0",
+          "#fff6dc"
+        ]
+      },
+      "amber-ink": {
+        "role": "primary",
+        "displayName": "Amber Ink",
+        "canonical": "#8a5a00",
+        "tonalRamp": [
+          "#3a2500",
+          "#533500",
+          "#6e4700",
+          "#8a5a00",
+          "#ffb000",
+          "#ffc840",
+          "#ffdc7a",
+          "#fff6dc"
+        ]
+      },
+      "cancel-red": {
+        "role": "secondary",
+        "displayName": "Cancel Red",
+        "canonical": "#c4161c",
+        "tonalRamp": [
+          "#3d0608",
+          "#5e0a0d",
+          "#8a0f13",
+          "#c4161c",
+          "#e0464b",
+          "#ff6b6b",
+          "#ffb3b3",
+          "#fde8e8"
+        ]
+      },
+      "cancel-red-on-board": {
+        "role": "secondary",
+        "displayName": "Cancel Red on Board",
+        "canonical": "#ff6b6b",
+        "tonalRamp": [
+          "#3d0608",
+          "#5e0a0d",
+          "#8a0f13",
+          "#c4161c",
+          "#e0464b",
+          "#ff6b6b",
+          "#ffb3b3",
+          "#fde8e8"
+        ]
+      },
+      "flap-black": {
+        "role": "neutral",
+        "displayName": "Flap Black",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#0e0f11"
+      },
+      "flap-cell": {
+        "role": "neutral",
+        "displayName": "Flap Cell",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#191b1f"
+      },
+      "steel-frame": {
+        "role": "neutral",
+        "displayName": "Steel Frame",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#2a2d31"
+      },
+      "board-white": {
+        "role": "neutral",
+        "displayName": "Board White",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#f2f2f0"
+      },
+      "board-dim": {
+        "role": "neutral",
+        "displayName": "Board Dim",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#9a9ea5"
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#383b41"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#5a5e66"
+      },
+      "steel": {
+        "role": "neutral",
+        "displayName": "Steel",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#a7aaaf"
+      },
+      "rule-line": {
+        "role": "neutral",
+        "displayName": "Rule Line",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#d2d5d8"
+      },
+      "concourse": {
+        "role": "neutral",
+        "displayName": "Concourse",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#eceeef"
+      },
+      "work-surface": {
+        "role": "neutral",
+        "displayName": "Work Surface",
+        "tonalRamp": [
+          "#0e0f11",
+          "#191b1f",
+          "#2a2d31",
+          "#383b41",
+          "#5a5e66",
+          "#9a9ea5",
+          "#d2d5d8",
+          "#eceeef"
+        ],
+        "canonical": "#ffffff"
+      }
+    },
+    "typographyMeta": {
+      "board-display": {
+        "displayName": "Board Display",
+        "purpose": "Page board header in flap cells (FlapText/FlapStatic)."
+      },
+      "board-row": {
+        "displayName": "Board Row",
+        "purpose": "Names, codes, prices and statuses inside board rows; 1.15rem mobile, 1.35rem desktop."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Concourse section and page titles, sentence case; 1.875rem to 2.75rem."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet, panel and day titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Concourse prose, normal width."
+      },
+      "ui-label": {
+        "displayName": "UI Label",
+        "purpose": "Buttons, field labels, nav links."
+      },
+      "col-label": {
+        "displayName": "Column Label",
+        "purpose": "Column headers of board tables and ruled lists only. Never an eyebrow."
+      }
+    },
+    "shadows": [
+      {
+        "name": "board-frame",
+        "value": "0 0 0 5px #2a2d31",
+        "purpose": "Steel frame around every dark board, paired with a 1px #3a3d42 border."
+      },
+      {
+        "name": "float",
+        "value": "0 1px 0 rgb(14 15 17 / 0.08), 0 20px 44px -18px rgb(14 15 17 / 0.42)",
+        "purpose": "Sheets, popovers, menus, toasts, floating assistant button."
+      },
+      {
+        "name": "active-bar",
+        "value": "inset 0 -3px 0 #ffb000",
+        "purpose": "Amber bar marking the active nav link or tab."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid #0e0f11; outline-offset: 2px; box-shadow: 0 0 0 4px #ffb000",
+        "purpose": "Global focus-visible ring."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Default easing for state changes, press and flap drop."
+      },
+      {
+        "name": "ease-drawer",
+        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "purpose": "Sheet and drawer entry (300ms)."
+      },
+      {
+        "name": "flap-drop",
+        "value": "110ms; perspective(240px) rotateX(-70deg) to 0, brightness 0.55 to 1",
+        "purpose": "One flap falling onto the hinge."
+      },
+      {
+        "name": "flap-cascade",
+        "value": "2-5 rolls per cell, 55ms per roll, 22ms stagger left to right; rows staggered 70ms",
+        "purpose": "Signature cascade when board text changes; instant under reduced motion."
+      },
+      {
+        "name": "press",
+        "value": "scale(0.97), 160ms ease-out",
+        "purpose": "Active state of every button."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Action Button",
+      "kind": "button",
+      "refersTo": "button-action",
+      "description": "Amber: the one primary action of a region (Cerca, Crea viaggio, Assistente).",
+      "html": "<button class=\"ds-btn-action\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 256 256\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/></svg> Cerca</button>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-btn-action{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:4px;font-weight:600;font-size:14px;letter-spacing:0.01em;border:none;cursor:pointer;transition:background-color 150ms,border-color 150ms,transform 160ms cubic-bezier(0.23,1,0.32,1);background:var(--color-brand-500);color:var(--color-ink)}.ds-btn-action:hover{background:var(--color-brand-300)}.ds-btn-action:active{transform:scale(0.97)}.ds-btn-action:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;box-shadow:0 0 0 4px var(--color-brand-500);}"
+    },
+    {
+      "name": "Board Button",
+      "kind": "button",
+      "refersTo": "button-board",
+      "description": "Black board button for strong non-primary actions.",
+      "html": "<button class=\"ds-btn-board\">Salva viaggio</button>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-btn-board{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:4px;font-weight:600;font-size:14px;letter-spacing:0.01em;border:none;cursor:pointer;transition:background-color 150ms,border-color 150ms,transform 160ms cubic-bezier(0.23,1,0.32,1);background:var(--color-ink);color:var(--color-board-text)}.ds-btn-board:hover{background:var(--color-board-frame)}.ds-btn-board:active{transform:scale(0.97)}.ds-btn-board:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;box-shadow:0 0 0 4px var(--color-brand-500);}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Quiet secondary action on the concourse.",
+      "html": "<button class=\"ds-btn-outline\">Cerca ispirazione</button>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-btn-outline{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:4px;font-weight:600;font-size:14px;letter-spacing:0.01em;border:none;cursor:pointer;transition:background-color 150ms,border-color 150ms,transform 160ms cubic-bezier(0.23,1,0.32,1);background:var(--color-surface);color:var(--color-ink);border:1px solid rgb(14 15 17 / 0.25)}.ds-btn-outline:hover{border-color:var(--color-ink)}.ds-btn-outline:active{transform:scale(0.97)}.ds-btn-outline:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;box-shadow:0 0 0 4px var(--color-brand-500);}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White field on the concourse; ink border and amber ring on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Nome del viaggio</span><input class=\"ds-input\" placeholder=\"Lisbona aprile 2027\"></label>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-field{display:flex;flex-direction:column;gap:6px;max-width:320px}.ds-field-label{font-size:14px;font-weight:600;color:var(--color-ink)}.ds-input{height:44px;padding:0 12px;border-radius:4px;border:1px solid rgb(14 15 17 / 0.2);background:var(--color-surface);color:var(--color-ink);font:inherit;font-size:16px;transition:border-color 150ms,box-shadow 150ms}.ds-input:hover{border-color:rgb(14 15 17 / 0.4)}.ds-input:focus{outline:none;border-color:var(--color-ink);box-shadow:0 0 0 3px var(--color-brand-500)}"
+    },
+    {
+      "name": "Nav Strip",
+      "kind": "nav",
+      "refersTo": "button-action",
+      "description": "Black 56px strip, flap wordmark left, amber bar under the active link, one amber action.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-flap ds-flap-sm ds-logo\"><span class=\"ds-flap-cell\"><span>T</span></span><span class=\"ds-flap-cell\"><span>R</span></span><span class=\"ds-flap-cell\"><span>A</span></span><span class=\"ds-flap-cell\"><span>V</span></span><span class=\"ds-flap-cell\"><span>E</span></span><span class=\"ds-flap-cell\"><span>L</span></span><span class=\"ds-flap-cell ds-io\"><span>I</span></span><span class=\"ds-flap-cell ds-io\"><span>O</span></span></span><a class=\"ds-nav-link\" href=\"#\">Esplora</a><a class=\"ds-nav-link\" aria-current=\"page\" href=\"#\">I miei viaggi</a><a class=\"ds-nav-link\" href=\"#\">Ispirazione</a><button class=\"ds-nav-cta\">Crea viaggio</button></nav>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-flap{display:inline-flex;gap:0.08em;font-stretch:70%;font-weight:650;text-transform:uppercase;font-variant-numeric:tabular-nums;letter-spacing:0}.ds-flap-cell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:0.74em;height:1.08em;background:var(--color-board-cell);border-radius:2px;color:var(--color-board-text);line-height:1;letter-spacing:0}.ds-flap-cell::after{content:'';position:absolute;inset-inline:0;top:50%;height:1px;background:rgb(0 0 0 / 0.75)}.ds-flap-sm .ds-flap-cell::after{display:none}.ds-nav{display:flex;align-items:center;gap:28px;height:56px;padding:0 24px;background:var(--color-board);border-bottom:1px solid var(--color-board-frame);color:var(--color-board-text)}.ds-logo{font-size:14px}.ds-io{background:var(--color-brand-500);color:var(--color-ink)}.ds-nav-link{display:flex;align-items:center;height:56px;font-size:14px;font-weight:500;color:var(--color-board-dim);text-decoration:none}.ds-nav-link:hover{color:var(--color-board-text)}.ds-nav-link[aria-current]{color:var(--color-board-text);box-shadow:inset 0 -3px 0 var(--color-brand-500)}.ds-nav-link:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;box-shadow:0 0 0 4px var(--color-brand-500);}.ds-nav-cta{margin-left:auto;height:36px;padding:0 12px;border:none;border-radius:4px;background:var(--color-brand-500);color:var(--color-ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}.ds-nav-cta:hover{background:var(--color-brand-300)}"
+    },
+    {
+      "name": "Month Tabs",
+      "kind": "chip",
+      "refersTo": "month-tab",
+      "description": "A row of flap cells; the selected month is the only amber cell.",
+      "html": "<ul class=\"ds-months\"><li><a href=\"#\" aria-current=\"true\">Nov</a></li><li><a href=\"#\">Dic</a></li><li><a href=\"#\">Gen</a></li><li><a href=\"#\">Feb</a></li><li><a href=\"#\">Mar</a></li></ul>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-months{display:inline-flex;gap:1px;padding:4px;margin:0;list-style:none;background:var(--color-board);border-radius:4px}.ds-months a{display:block;padding:6px 10px;border-radius:2px;background:var(--color-board-cell);color:var(--color-board-dim);font-size:14px;font-stretch:70%;font-weight:650;text-transform:uppercase;letter-spacing:0.06em;text-decoration:none;transition:color 150ms}.ds-months a:hover{color:var(--color-board-text)}.ds-months a[aria-current]{background:var(--color-brand-500);color:var(--color-ink)}.ds-months a:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;box-shadow:0 0 0 4px var(--color-brand-500);}"
+    },
+    {
+      "name": "Flap Text",
+      "kind": "custom",
+      "refersTo": "flap-cell",
+      "description": "Signature: one character per cell with a hinge line; hinge hidden below 18px.",
+      "html": "<div class=\"ds-flap-demo\"><span class=\"ds-flap\" style=\"font-size:40px\"><span class=\"ds-flap-cell\"><span>P</span></span><span class=\"ds-flap-cell\"><span>A</span></span><span class=\"ds-flap-cell\"><span>R</span></span><span class=\"ds-flap-cell\"><span>T</span></span><span class=\"ds-flap-cell\"><span>E</span></span><span class=\"ds-flap-cell\"><span>N</span></span><span class=\"ds-flap-cell\"><span>Z</span></span><span class=\"ds-flap-cell\"><span>E</span></span></span><span class=\"ds-flap ds-flap-sm\" style=\"font-size:14px\"><span class=\"ds-flap-cell\"><span>I</span></span><span class=\"ds-flap-cell\"><span>N</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>C</span></span><span class=\"ds-flap-cell\"><span>O</span></span><span class=\"ds-flap-cell\"><span>R</span></span><span class=\"ds-flap-cell\"><span>S</span></span><span class=\"ds-flap-cell\"><span>O</span></span></span></div>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-flap{display:inline-flex;gap:0.08em;font-stretch:70%;font-weight:650;text-transform:uppercase;font-variant-numeric:tabular-nums;letter-spacing:0}.ds-flap-cell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:0.74em;height:1.08em;background:var(--color-board-cell);border-radius:2px;color:var(--color-board-text);line-height:1;letter-spacing:0}.ds-flap-cell::after{content:'';position:absolute;inset-inline:0;top:50%;height:1px;background:rgb(0 0 0 / 0.75)}.ds-flap-sm .ds-flap-cell::after{display:none}.ds-flap-demo{display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:20px;background:var(--color-board)}.ds-flap-sm .ds-flap-cell{color:var(--color-brand-500)}"
+    },
+    {
+      "name": "Departures Board",
+      "kind": "custom",
+      "refersTo": "board-panel",
+      "description": "Framed black board: column labels, then linked rows of flap cells; real prices in amber.",
+      "html": "<div class=\"ds-board\"><div class=\"ds-board-head\"><span>Destinazione</span><span>Scalo</span><span>A/R da NAP</span><span></span></div><a class=\"ds-board-row\" href=\"#\"><span class=\"ds-flap\"><span class=\"ds-flap-cell\"><span>L</span></span><span class=\"ds-flap-cell\"><span>I</span></span><span class=\"ds-flap-cell\"><span>S</span></span><span class=\"ds-flap-cell\"><span>B</span></span><span class=\"ds-flap-cell\"><span>O</span></span><span class=\"ds-flap-cell\"><span>N</span></span><span class=\"ds-flap-cell\"><span>A</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span></span><span class=\"ds-flap\"><span class=\"ds-flap-cell\"><span>L</span></span><span class=\"ds-flap-cell\"><span>I</span></span><span class=\"ds-flap-cell\"><span>S</span></span></span><span class=\"ds-flap ds-price\"><span class=\"ds-flap-cell\"><span>1</span></span><span class=\"ds-flap-cell\"><span>8</span></span><span class=\"ds-flap-cell\"><span>9</span></span><span class=\"ds-flap-cell\"><span>€</span></span></span><span class=\"ds-arrow\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 256 256\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></span></a><a class=\"ds-board-row\" href=\"#\"><span class=\"ds-flap\"><span class=\"ds-flap-cell\"><span>P</span></span><span class=\"ds-flap-cell\"><span>R</span></span><span class=\"ds-flap-cell\"><span>A</span></span><span class=\"ds-flap-cell\"><span>G</span></span><span class=\"ds-flap-cell\"><span>A</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span><span class=\"ds-flap-cell\"><span>&nbsp;</span></span></span><span class=\"ds-flap\"><span class=\"ds-flap-cell\"><span>P</span></span><span class=\"ds-flap-cell\"><span>R</span></span><span class=\"ds-flap-cell\"><span>G</span></span></span><span class=\"ds-dim\">DA RILEVARE</span><span class=\"ds-arrow\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 256 256\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></span></a></div>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-flap{display:inline-flex;gap:0.08em;font-stretch:70%;font-weight:650;text-transform:uppercase;font-variant-numeric:tabular-nums;letter-spacing:0}.ds-flap-cell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:0.74em;height:1.08em;background:var(--color-board-cell);border-radius:2px;color:var(--color-board-text);line-height:1;letter-spacing:0}.ds-flap-cell::after{content:'';position:absolute;inset-inline:0;top:50%;height:1px;background:rgb(0 0 0 / 0.75)}.ds-flap-sm .ds-flap-cell::after{display:none}.ds-board{background:var(--color-board);border:1px solid #3a3d42;border-radius:4px;box-shadow:0 0 0 5px var(--color-board-frame);padding:8px 20px;margin:6px;color:var(--color-board-text)}.ds-board-head,.ds-board-row{display:grid;grid-template-columns:minmax(0,1.5fr) 4.5rem 7rem 1.25rem;align-items:center;gap:0 24px}.ds-board-head{padding-bottom:8px;border-bottom:1px solid var(--color-board-frame);color:var(--color-board-dim);font-size:11px;font-weight:600;font-stretch:85%;text-transform:uppercase;letter-spacing:0.12em}.ds-board-row{padding:12px 0;border-bottom:1px solid rgb(42 45 49 / 0.7);color:inherit;text-decoration:none;font-size:21.6px;transition:background-color 150ms}.ds-board-row:last-child{border-bottom:none}.ds-board-row:hover{background:rgb(42 45 49 / 0.6)}.ds-board-row:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;box-shadow:0 0 0 4px var(--color-brand-500);}.ds-price .ds-flap-cell{color:var(--color-brand-500)}.ds-dim{font-size:12px;font-stretch:70%;font-weight:650;letter-spacing:0.06em;color:var(--color-board-dim);text-align:right}.ds-arrow{display:flex;color:var(--color-board-dim);transition:color 200ms,transform 200ms}.ds-board-row:hover .ds-arrow{color:var(--color-brand-500);transform:translateX(2px)}"
+    },
+    {
+      "name": "Timetable Row",
+      "kind": "custom",
+      "refersTo": "time-chip",
+      "description": "Itinerary activity as a ruled row with a flap-style time chip; active row goes white with an amber chip.",
+      "html": "<div class=\"ds-tt\"><article class=\"ds-tt-row\"><time class=\"ds-time\">11:00</time><div><h4>Arrivo e check-in</h4><p>45 min · Centro di Lisbona</p></div></article><article class=\"ds-tt-row ds-active\"><time class=\"ds-time\">12:15</time><div><h4>Praça do Comércio e Baixa</h4><p>1h · Gratis</p></div></article></div>",
+      "css": ":host{--color-brand-500:#ffb000;--color-brand-300:#ffc840;--color-board:#0e0f11;--color-board-cell:#191b1f;--color-board-frame:#2a2d31;--color-board-text:#f2f2f0;--color-board-dim:#9a9ea5;--color-ink:#0e0f11;--color-danger:#c4161c;--color-surface:#fff;--color-line:#d2d5d8;font-family:'Archivo Variable',ui-sans-serif,system-ui,sans-serif}.ds-tt{background:#eceeef;padding:12px 16px;border-top:2px solid var(--color-ink)}.ds-tt-row{display:flex;gap:12px;padding:12px 4px;border-bottom:1px solid var(--color-line);cursor:pointer;transition:background-color 150ms}.ds-tt-row:hover{background:rgb(255 255 255 / 0.6)}.ds-tt-row.ds-active{background:var(--color-surface)}.ds-time{align-self:flex-start;padding:2px 6px;border-radius:2px;background:var(--color-ink);color:var(--color-board-text);font-size:16.8px;line-height:1;font-stretch:70%;font-weight:650;letter-spacing:0.02em;font-variant-numeric:tabular-nums}.ds-active .ds-time{background:var(--color-brand-500);color:var(--color-ink)}.ds-tt-row h4{margin:0;font-size:16px;font-weight:600}.ds-tt-row p{margin:2px 0 0;font-size:12px;color:#5a5e66}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Departures Board",
+    "overview": "TravelIo is the Solari split-flap board of your own airport. Where you can go, when and for how much is posted on black boards in white condensed capitals, one character per cell; the trip you chose stays on the board as your own row, with a status, a timetable (the itinerary) and a ledger (the budget). The board is the place to read and choose; the concourse around it, a light cool steel with white work surfaces, is where you type, edit and plan.\n\nDensity is that of an instrument, not a brochure. Information sits in rows and ruled columns read along one left axis, figures are tabular, and the only motion with character is the per-character flap cascade when a board's text changes. Colour is almost absent: black, steel and white carry everything, so the two signal colours can mean exactly one thing each. Delay amber says \"act here, this is selected\"; cancel red says \"over budget, error, cancelled\". The world refuses the booking-portal arrangement (photo hero, centred search pill, grid of equal destination cards) and the dark chat-first \"AI planner\".",
+    "keyCharacteristics": [
+      "Black flap boards in a steel frame, set on a light steel concourse.",
+      "One variable typeface, Archivo, stretched: condensed capitals on the board and in headlines, normal width for UI and reading.",
+      "Two signal colours with one meaning each; no green, no third accent.",
+      "Rows and rules instead of cards; one left axis on every page.",
+      "Squared 4px corners, 2px on flap cells; flat surfaces, depth from the steel frame.",
+      "Phosphor icons only; the flap cascade is the signature motion and is instant under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Delay Amber is only for the primary action, the current selection and the active state. If an amber element cannot be clicked and does not mark \"this one, now\", it is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Soppresso Rule",
+        "body": "Cancel Red is only for over budget, errors and cancelled. Budget escalates calm, then amber \"attenzione\", then red \"sforato\"; nothing else turns red.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Green Rule",
+        "body": "No green appears in the world. Success and \"real price\" are said in words and in board white or amber, never with a green lamp.",
+        "section": "colors"
+      },
+      {
+        "name": "The Steel Days Rule",
+        "body": "Itinerary day colours (map pins, day dots in \"Tutti i giorni\") use the steel scale only: #0e0f11, #5a5e66, #9a9ea5, #383b41, #7d8188, #c4c7cb, #2a2d31, #a7aaaf. Amber stays for the active day, red for alarms.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Face Rule",
+        "body": "Archivo variable is the only typeface. Condensed width for flaps and headlines, normal width for UI and body. No second family, no system display face, no monospace.",
+        "section": "typography"
+      },
+      {
+        "name": "The Cell Spacing Rule",
+        "body": "Inside flap cells letter-spacing is 0: the cell gap (0.08em) is the spacing. The hinge line across the middle of a cell is hidden below 18px via the small-flap modifier, because at that size it would cut through the letters.",
+        "section": "typography"
+      },
+      {
+        "name": "The Column Header Rule",
+        "body": "Tracked caps are only for table column headers. No eyebrow or kicker label above a heading; the heading speaks for itself.",
+        "section": "typography"
+      },
+      {
+        "name": "The Framed Board Rule",
+        "body": "A dark board is always wrapped in the steel board-panel frame. A black block without its frame is not a board.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Flat Concourse Rule",
+        "body": "Nothing on the concourse casts a shadow at rest. Only floating layers get the Float shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every dark board in the steel board-panel frame (1px #3a3d42 border plus a 5px #2a2d31 frame).",
+      "Do set board text with FlapText or FlapStatic, letter-spacing 0 in the cells, and add the small-flap modifier below 18px so the hinge disappears.",
+      "Do reserve Delay Amber (#ffb000) for the primary action, the current selection and the active state.",
+      "Do reserve Cancel Red (#c4161c, #ff6b6b on the board) for over budget, errors and cancelled.",
+      "Do colour itinerary days with the steel scale only.",
+      "Do lay content out as rows and ruled columns, left-aligned on the single container axis.",
+      "Do use Phosphor icons imported from \"@phosphor-icons/react/dist/ssr\".",
+      "Do use 4px corners everywhere and 2px on flap cells."
+    ],
+    "donts": [
+      "Don't use green anywhere, for success, live data or \"direct flight\".",
+      "Don't put eyebrow or kicker labels above headings; tracked caps (column label) are only for table column headers.",
+      "Don't nest a card inside a card, or turn a list into a grid of equal cards.",
+      "Don't centre a page or a hero; there is one left axis.",
+      "Don't use emoji as icons.",
+      "Don't introduce a second typeface; Archivo variable is the only one.",
+      "Don't use amber for decoration, illustration or a category colour.",
+      "Don't use pills, large radii or drop shadows on concourse surfaces."
+    ]
+  }
+}

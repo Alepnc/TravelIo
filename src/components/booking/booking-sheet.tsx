@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, ShieldCheck } from "lucide-react";
+import { ArrowSquareOut as ExternalLink, ShieldCheck } from "@phosphor-icons/react/dist/ssr";
 import type { BookingOption } from "@/lib/types";
 import { buttonClass } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
@@ -65,24 +65,24 @@ function Options({ request }: { request: BookingRequest }) {
     );
   if (state.status === "error")
     return (
-      <p role="alert" className="rounded-2xl bg-danger/5 p-4 text-sm text-danger">
+      <p role="alert" className="rounded-md border border-danger/30 p-4 text-sm text-danger">
         {state.message}
       </p>
     );
   if (state.options.length === 0)
-    return <p className="rounded-2xl border border-dashed border-line p-5 text-center text-sm text-muted">Nessun venditore disponibile per questa offerta. Ripeti la ricerca: i prezzi cambiano di continuo.</p>;
+    return <p className="rounded-md border border-dashed border-ink/25 p-5 text-sm text-muted">Nessun venditore disponibile per questa offerta. Ripeti la ricerca: i prezzi cambiano di continuo.</p>;
 
   const cheapest = Math.min(...state.options.map((o) => o.price ?? Infinity));
   return (
     <ul className="space-y-2.5">
       {state.options.map((o, i) => (
-        <li key={`${o.seller}-${i}`} className={cn("flex items-center gap-3 rounded-2xl border p-3.5", o.price === cheapest ? "border-success/40 bg-success/5" : "border-line")}>
+        <li key={`${o.seller}-${i}`} className={cn("flex items-center gap-3 rounded-md border p-3.5", o.price === cheapest ? "border-ink shadow-[inset_0_3px_0_var(--color-brand-500)]" : "border-line")}>
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold">{o.seller}</p>
             {o.note && <p className="line-clamp-2 text-xs text-muted">{o.note}</p>}
-            {o.price === cheapest && <p className="mt-0.5 text-xs font-bold text-success">Prezzo più basso</p>}
+            {o.price === cheapest && <p className="mt-0.5 text-xs font-bold text-ink">Prezzo più basso</p>}
           </div>
-          <p className="shrink-0 text-right font-display text-xl font-extrabold tabular-nums">{o.price != null ? formatPrice(o.price) : "—"}</p>
+          <p className="tabular shrink-0 text-right text-xl font-bold [font-stretch:85%]">{o.price != null ? formatPrice(o.price) : "n.d."}</p>
           <SellerButton option={o} />
         </li>
       ))}
@@ -98,7 +98,7 @@ export function BookingSheet({ open, onClose, title, request }: { open: boolean;
   return (
     <Sheet open={open && !!request} onClose={onClose} title={title}>
       <p className="mb-4 flex items-start gap-2 text-sm text-ink-soft">
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ink" />
         <span>Prenoti direttamente sul sito del venditore. Lì trovi prezzo finale, bagagli e condizioni, che possono differire da quelli mostrati qui.</span>
       </p>
       {request && <Options key={JSON.stringify(request)} request={request} />}

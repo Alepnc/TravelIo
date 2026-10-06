@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { BedDouble, Minus, Plane, Plus, X } from "lucide-react";
+import { Bed as BedDouble, Minus, AirplaneTilt as Plane, Plus, X } from "@phosphor-icons/react/dist/ssr";
 import type { FormState } from "@/app/actions/state";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -69,7 +69,7 @@ export function TripForm({
   return (
     <form action={(fd) => { if (selectionMatches) clear(); return formAction(fd); }} className="space-y-6" noValidate>
       {state.message && (
-        <p role="alert" className="rounded-xl bg-danger/10 px-3.5 py-2.5 text-sm text-danger">
+        <p role="alert" className="rounded-md bg-danger px-3.5 py-2.5 text-sm font-medium text-white">
           {state.message}
         </p>
       )}
@@ -112,12 +112,12 @@ export function TripForm({
           </Select>
         </Field>
         <Field label="Viaggiatori" htmlFor="travelersCount" error={errors.travelersCount}>
-          <div className="flex h-11 items-center justify-between rounded-xl border border-line bg-surface px-1.5">
-            <button type="button" className="press flex h-8 w-8 items-center justify-center rounded-lg hoverable:hover:bg-ink/5 disabled:opacity-40" disabled={travelers <= 1} onClick={() => setTravelers((t) => t - 1)} aria-label="Meno viaggiatori">
+          <div className="flex h-11 items-center justify-between rounded-md border border-ink/20 bg-surface px-1">
+            <button type="button" className="press flex h-9 w-9 items-center justify-center rounded-sm hoverable:hover:bg-ink/[0.06] disabled:opacity-40" disabled={travelers <= 1} onClick={() => setTravelers((t) => t - 1)} aria-label="Meno viaggiatori">
               <Minus className="h-4 w-4" />
             </button>
             <span className="font-semibold tabular-nums">{travelers}</span>
-            <button type="button" className="press flex h-8 w-8 items-center justify-center rounded-lg hoverable:hover:bg-ink/5 disabled:opacity-40" disabled={travelers >= 12} onClick={() => setTravelers((t) => t + 1)} aria-label="Più viaggiatori">
+            <button type="button" className="press flex h-9 w-9 items-center justify-center rounded-sm hoverable:hover:bg-ink/[0.06] disabled:opacity-40" disabled={travelers >= 12} onClick={() => setTravelers((t) => t + 1)} aria-label="Più viaggiatori">
               <Plus className="h-4 w-4" />
             </button>
           </div>
@@ -129,7 +129,7 @@ export function TripForm({
       </div>
 
       {travelers > 1 && (
-        <details className="rounded-2xl border border-line bg-surface p-4">
+        <details className="border-y border-line py-4">
           <summary className="cursor-pointer text-sm font-semibold">Chi viene con te? (opzionale)</summary>
           <div className="mt-3 space-y-2">
             {Array.from({ length: travelers - 1 }, (_, i) => (
@@ -142,47 +142,47 @@ export function TripForm({
       )}
 
       <fieldset>
-        <legend className="mb-1.5 text-sm font-medium text-ink-soft">Ritmo del viaggio</legend>
+        <legend className="mb-1.5 text-sm font-semibold">Ritmo del viaggio</legend>
         <div className="grid grid-cols-3 gap-2">
           {PACES.map((p) => (
-            <label key={p.key} className={cn("press cursor-pointer rounded-2xl border p-3 text-center transition-colors duration-150", pace === p.key ? "border-brand-500 bg-brand-50" : "border-line bg-surface")}>
+            <label key={p.key} className={cn("press cursor-pointer rounded-md border p-3 transition-colors duration-150 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-brand-500", pace === p.key ? "border-ink bg-ink text-board-text" : "border-ink/15 bg-surface hoverable:hover:border-ink/50")}>
               <input type="radio" name="pace" value={p.key} checked={pace === p.key} onChange={() => setPace(p.key)} className="sr-only" />
               <span className="block text-sm font-semibold">{p.label}</span>
-              <span className="block text-xs text-muted">{p.hint}</span>
+              <span className={cn("block text-xs", pace === p.key ? "text-board-dim" : "text-muted")}>{p.hint}</span>
             </label>
           ))}
         </div>
       </fieldset>
 
       {selectionMatches && (selection.outbound || selection.inbound || selection.stay) && (
-        <div className="rounded-2xl border border-brand-200 bg-brand-50/60 p-4">
+        <div className="rounded-md bg-board p-4 text-board-text">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-bold">Dalla tua ricerca</p>
-            <button type="button" onClick={clear} className="flex items-center gap-1 text-xs font-semibold text-muted">
+            <p className="col-label text-board-dim">Dalla tua ricerca</p>
+            <button type="button" onClick={clear} className="flex items-center gap-1 text-xs font-semibold text-board-dim hoverable:hover:text-board-text">
               <X className="h-3.5 w-3.5" /> Rimuovi
             </button>
           </div>
           <ul className="mt-2 space-y-1.5 text-sm">
             {selection.outbound && (
               <li className="flex items-center gap-2">
-                <Plane className="h-4 w-4 text-brand-600" /> Andata {selection.outbound.airline} · {formatPrice(selection.outbound.price)} a persona
+                <Plane className="h-4 w-4 text-brand-500" /> Andata {selection.outbound.airline} · {formatPrice(selection.outbound.price)} a persona
                 <input type="hidden" name="outboundOfferId" value={selection.outbound.id} />
               </li>
             )}
             {selection.inbound && (
               <li className="flex items-center gap-2">
-                <Plane className="h-4 w-4 -scale-x-100 text-brand-600" /> Ritorno {selection.inbound.airline} · {formatPrice(selection.inbound.price)} a persona
+                <Plane className="h-4 w-4 -scale-x-100 text-brand-500" /> Ritorno {selection.inbound.airline} · {formatPrice(selection.inbound.price)} a persona
                 <input type="hidden" name="returnOfferId" value={selection.inbound.id} />
               </li>
             )}
             {selection.stay && (
               <li className="flex items-center gap-2">
-                <BedDouble className="h-4 w-4 text-brand-600" /> {selection.stay.name} · {formatPrice(selection.stay.priceTotal)} totale
+                <BedDouble className="h-4 w-4 text-brand-500" /> {selection.stay.name} · {formatPrice(selection.stay.priceTotal)} totale
                 <input type="hidden" name="accommodationOfferId" value={selection.stay.id} />
               </li>
             )}
           </ul>
-          <p className="mt-2 text-xs text-muted">I prezzi vengono riverificati al salvataggio.</p>
+          <p className="mt-2 text-xs text-board-dim">I prezzi vengono riverificati al salvataggio.</p>
         </div>
       )}
 

@@ -1,18 +1,24 @@
 import type { ReactNode } from "react";
+import { FlapText } from "@/components/ui/flap";
 
+/** Accesso e registrazione: a sinistra il pannello del tabellone, a destra il modulo sull'atrio. */
 export function AuthShell({ title, subtitle, children, footer }: { title: string; subtitle?: string; children: ReactNode; footer?: ReactNode }) {
   return (
-    <div className="relative flex min-h-[calc(100dvh-4rem)] items-start justify-center px-4 pb-24 pt-10 sm:items-center sm:pt-6">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-brand-200/50 blur-3xl" />
-      </div>
-      <div className="w-full max-w-md animate-fade-up">
-        <div className="rounded-[1.75rem] border border-line bg-surface p-6 shadow-[var(--shadow-float)] sm:p-8">
-          <h1 className="text-3xl font-extrabold">{title}</h1>
-          {subtitle && <p className="mt-1.5 text-muted">{subtitle}</p>}
-          <div className="mt-6">{children}</div>
+    <div className="grid min-h-[calc(100dvh-3.5rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <div className="bg-board px-4 pb-8 pt-8 text-board-text sm:px-6 lg:flex lg:flex-col lg:justify-between lg:py-14 lg:pl-[max(1.5rem,calc((100vw-76rem)/2+1.5rem))] lg:pr-12">
+        <div>
+          <h1>
+            <FlapText text={title} className="text-[clamp(1.4rem,3.4vw,2.4rem)]" animateOnMount />
+          </h1>
+          {subtitle && <p className="mt-4 max-w-sm text-board-text/85">{subtitle}</p>}
         </div>
-        {footer && <div className="mt-5 text-center text-sm text-muted">{footer}</div>}
+        <p className="mt-10 hidden max-w-xs text-sm text-board-dim lg:block">Cerchi e confronti senza account. L&apos;account serve solo per salvare i viaggi e ritrovarli su ogni dispositivo.</p>
+      </div>
+      <div className="flex items-start px-4 pb-24 pt-8 sm:px-8 lg:items-center lg:px-16">
+        <div className="w-full max-w-md animate-fade-up">
+          {children}
+          {footer && <div className="mt-6 border-t border-line pt-5 text-sm text-muted">{footer}</div>}
+        </div>
       </div>
     </div>
   );

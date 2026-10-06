@@ -1,7 +1,8 @@
 import { DataSourceBadge } from "@/components/ui/data-source-badge";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { CalendarDays, Users } from "lucide-react";
+import { ArrowRight, CalendarDots as CalendarDays, Users } from "@phosphor-icons/react/dist/ssr";
+import { FlapText } from "@/components/ui/flap";
 import { SearchWidget } from "@/components/search/search-widget";
 import { SearchResults, type Loaded } from "@/components/search/search-results";
 import { DestinationSuggestions } from "@/components/discovery/suggestions";
@@ -64,7 +65,7 @@ async function FlexibleResults(props: { from: string; month?: number; depart?: s
 function ResultsSkeleton() {
   return (
     <div className="space-y-3">
-      <div className="skeleton h-10 w-48 rounded-full" />
+      <div className="skeleton h-11 w-48" />
       {Array.from({ length: 4 }, (_, i) => (
         <FlightCardSkeleton key={i} />
       ))}
@@ -121,16 +122,23 @@ export default async function SearchPage({ searchParams }: PageProps<"/cerca">) 
 
   return (
     <div className="pb-32">
-      <div className="border-b border-line bg-surface/60">
-        <Container className="py-5">
+      <div className="bg-board text-board-text">
+        <Container className="pb-8 pt-5">
           <SearchWidget compact origins={options.origins} destinations={options.destinations} defaults={{ from, to: q.to, depart: q.depart ?? depart, ret: q.ret ?? ret, month: q.month, travelers: q.travelers, budget: q.budget }} />
-        </Container>
-      </div>
-      <Container className="pt-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div className="mt-8 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-extrabold sm:text-4xl">{dest ? `${from} → ${dest.name}` : "Dove puoi andare"}</h1>
-            <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+            <h1 className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[clamp(1.4rem,4vw,2.4rem)]">
+              {dest ? (
+                <>
+                  <FlapText text={from} />
+                  <ArrowRight className="h-[0.8em] w-[0.8em] text-brand-500" weight="bold" aria-label="verso" />
+                  <FlapText text={dest.name} />
+                </>
+              ) : (
+                <FlapText text="Dove puoi andare" />
+              )}
+            </h1>
+            <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-board-dim">
               {dest && depart && ret ? (
                 <span className="flex items-center gap-1.5">
                   <CalendarDays className="h-4 w-4" /> {formatDateRange(depart, ret)} · {pluralize(diffDays(depart, ret), "notte", "notti")}
@@ -145,10 +153,13 @@ export default async function SearchPage({ searchParams }: PageProps<"/cerca">) 
               </span>
               {q.budget && <span>Budget {formatPrice(q.budget)} a persona</span>}
             </p>
-            {suggested && <p className="mt-2 text-sm font-medium text-brand-700">Ti mostriamo date indicative nel periodo migliore: cambiale quando vuoi.</p>}
+            {suggested && <p className="mt-2 text-sm font-medium text-brand-500">Ti mostriamo date indicative nel periodo migliore: cambiale quando vuoi.</p>}
           </div>
-          <DataSourceBadge />
-        </div>
+          <DataSourceBadge onBoard live={!!dest} />
+          </div>
+        </Container>
+      </div>
+      <Container className="pt-8">
 
         {dest && depart && ret ? (
           <Suspense key={`${from}-${dest.id}-${depart}-${ret}-${q.travelers}`} fallback={<ResultsSkeleton />}>

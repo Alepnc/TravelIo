@@ -7,7 +7,7 @@ import { cn } from "@/lib/format";
 export function NavLinks({ links }: { links: { href: string; label: string }[] }) {
   const pathname = usePathname();
   return (
-    <nav className="hidden items-center gap-1 md:flex" aria-label="Principale">
+    <nav className="hidden h-14 items-stretch gap-1 md:flex" aria-label="Principale">
       {links.map((l) => {
         const active = pathname === l.href || (l.href !== "/" && pathname.startsWith(l.href));
         return (
@@ -15,7 +15,10 @@ export function NavLinks({ links }: { links: { href: string; label: string }[] }
             key={l.href}
             href={l.href}
             aria-current={active ? "page" : undefined}
-            className={cn("rounded-full px-3.5 py-2 text-sm font-medium transition-colors duration-150", active ? "bg-ink/5 text-ink" : "text-muted hoverable:hover:text-ink")}
+            className={cn(
+              "relative flex items-center px-3 text-sm font-medium transition-colors duration-150 after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:transition-colors",
+              active ? "text-white after:bg-brand-500" : "text-board-dim after:bg-transparent hoverable:hover:text-white",
+            )}
           >
             {l.label}
           </Link>

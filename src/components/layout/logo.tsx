@@ -1,17 +1,13 @@
 import Link from "next/link";
+import { FlapStatic } from "@/components/ui/flap";
+import { cn } from "@/lib/format";
 
-export function Logo() {
+/** Il marchio è una riga del tabellone: TRAVELIO in palette, la "IO" in ambra. */
+export function Logo({ className }: { className?: string }) {
   return (
-    <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight" aria-label="TravelIo, home">
-      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500 text-white shadow-sm shadow-brand-500/40">
-        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <path d="M3 17c4-1 6-5 9-10 1.5 3 3.5 5 9 6" />
-          <circle cx="12" cy="7" r="1.2" fill="currentColor" />
-        </svg>
-      </span>
-      <span>
-        Travel<span className="text-brand-500">Io</span>
-      </span>
+    <Link href="/" className={cn("flex items-center rounded-sm text-[1.05rem]", className)} aria-label="TravelIo, home">
+      <FlapStatic text="Travel" className="gap-[0.06em]" />
+      <FlapStatic text="Io" className="ml-[0.06em] gap-[0.06em]" cellClassName="!bg-brand-500 !text-ink after:!bg-ink/30" />
     </Link>
   );
 }
