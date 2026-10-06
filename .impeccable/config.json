@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "archivo condensed",
+        "createdAt": "2026-10-06T17:38:12.161Z",
+        "reason": "agent: OG image registers the documented Archivo (wdth 75, 700) under a local Satori font name"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "archivo",
+        "createdAt": "2026-10-06T17:38:12.181Z",
+        "reason": "agent: OG image registers the documented Archivo (500) under a local Satori font name"
+      }
+    ]
+  }
+}

@@ -7,7 +7,10 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { DraftProvider } from "@/components/draft/draft-provider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
+  // URL assoluto per l'anteprima dei link (WhatsApp & co.): APP_URL, altrimenti il dominio di produzione di Vercel
+  metadataBase: new URL(
+    process.env.APP_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
+  ),
   title: { default: "TravelIo: organizza il tuo prossimo viaggio", template: "%s · TravelIo" },
   description: "Trova la meta, confronta voli e alloggi, crea l'itinerario su mappa e tieni sotto controllo il budget. Tutto in un'unica app.",
   openGraph: { type: "website", locale: "it_IT", siteName: "TravelIo" },
