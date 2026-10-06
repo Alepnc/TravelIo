@@ -32,14 +32,14 @@ const depart = addDays(todayISO(), 45);
 const checkOut = addDays(depart, 4);
 const flights = createSerpApiFlights();
 const stays = createSerpApiAccommodations();
-const before = usageThisMonth();
+const before = await usageThisMonth();
 console.log(`Quota prima: ${before.used}/${before.limit}. Date di prova: ${depart} → ${checkOut}\n`);
 
 try {
   console.log("1) Voli NAP → BCN (sola andata)");
   const offers = await flights.search({ from: "NAP", to: "BCN", date: depart, travelers: 1 });
   // Risposta grezza dalla cache della stessa ricerca (nessuna ricerca in più)
-  const raw = serpApiClient.peek(`serpapi:fl:ow:NAP:BCN:${depart}`);
+  const raw = await serpApiClient.peek(`serpapi:fl:ow:NAP:BCN:${depart}`);
   const sample = raw && itineraryList(raw.json)[0];
   console.log(`  chiavi di primo livello: ${raw ? Object.keys(raw.json).join(", ") : "-"}`);
   console.log(`  campi del primo itinerario: ${sample ? Object.keys(sample as object).join(", ") : "(nessuno)"}`);
@@ -72,7 +72,7 @@ try {
   ko(`errore: ${e instanceof Error ? e.message : e}`);
 }
 
-const after = usageThisMonth();
+const after = await usageThisMonth();
 console.log(`\nQuota dopo: ${after.used}/${after.limit} (${after.used - before.used} ricerche usate)`);
 console.log(failures ? `\n${failures} controllo/i falliti: incolla l'output a Claude per adattare il parsing.` : "\nTutto coerente con le attese.");
 process.exit(failures ? 1 : 0);

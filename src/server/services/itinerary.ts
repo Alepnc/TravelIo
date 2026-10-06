@@ -23,11 +23,11 @@ function toActivity(a: ActivityRow): ItineraryActivity {
 }
 
 export async function loadItinerary(tripId: string): Promise<Itinerary | null> {
-  const itin = db.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).get();
+  const itin = await db.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).limit(1).then((r) => r[0]);
   if (!itin) return null;
-  const days = db.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itin.id)).orderBy(asc(schema.itineraryDays.dayIndex)).all();
+  const days = await db.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itin.id)).orderBy(asc(schema.itineraryDays.dayIndex));
   const acts = days.length
-    ? db.select().from(schema.activities).where(inArray(schema.activities.dayId, days.map((d) => d.id))).orderBy(asc(schema.activities.position)).all()
+    ? await db.select().from(schema.activities).where(inArray(schema.activities.dayId, days.map((d) => d.id))).orderBy(asc(schema.activities.position))
     : [];
   return {
     id: itin.id,
@@ -49,9 +49,9 @@ async function buildContext(trip: TripRow, userId: string, pace?: TripPace): Pro
   const [dest, pois, flightRows, stay, prefs] = await Promise.all([
     destinations.get(trip.destinationId),
     activityProvider.listForDestination(trip.destinationId),
-    db.select().from(schema.tripFlights).where(eq(schema.tripFlights.tripId, trip.id)).all(),
-    db.select().from(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, trip.id)).get(),
-    db.select().from(schema.preferences).where(eq(schema.preferences.userId, userId)).get(),
+    db.select().from(schema.tripFlights).where(eq(schema.tripFlights.tripId, trip.id)),
+    db.select().from(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, trip.id)).limit(1).then((r) => r[0]),
+    db.select().from(schema.preferences).where(eq(schema.preferences.userId, userId)).limit(1).then((r) => r[0]),
   ]);
   if (!pois.length) throw new AppError("unavailable", "Non abbiamo ancora attività per questa destinazione. Puoi aggiungerle a mano.");
 
@@ -88,17 +88,16 @@ function rowToDraft(a: ActivityRow): DraftActivity {
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-function insertDraftActivities(tx: Tx, dayId: string, drafts: DraftActivity[], source: "generated" | "assistant" = "generated") {
+async function insertDraftActivities(tx: Tx, dayId: string, drafts: DraftActivity[], source: "generated" | "assistant" = "generated") {
   if (!drafts.length) return;
-  tx.insert(schema.activities)
+  await tx.insert(schema.activities)
     .values(
       drafts.map((a, i) => ({
         dayId, position: i, title: a.title, category: a.category, startTime: a.startTime, durationMin: a.durationMin,
         placeName: a.placeName, lat: a.lat, lng: a.lng, cost: a.cost, notes: a.notes, poiId: a.poiId, source,
         timeLocked: a.timeLocked, isUserModified: false,
       })),
-    )
-    .run();
+    );
 }
 
 /**
@@ -110,15 +109,15 @@ export async function generateItineraryForTrip(
   tripId: string,
   opts: { pace?: TripPace; overwriteUserChanges?: boolean } = {},
 ): Promise<{ itinerary: Itinerary; preservedDays: number }> {
-  const trip = getOwnedTripRow(userId, tripId);
+  const trip = await getOwnedTripRow(userId, tripId);
   const ctx = await buildContext(trip, userId, opts.pace);
-  const existing = db.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).get();
+  const existing = await db.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).limit(1).then((r) => r[0]);
   const existingDays = existing
-    ? db.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, existing.id)).all()
+    ? await db.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, existing.id))
     : [];
   const preserved = opts.overwriteUserChanges ? [] : existingDays.filter((d) => d.isUserModified);
   const preservedActs = preserved.length
-    ? db.select().from(schema.activities).where(inArray(schema.activities.dayId, preserved.map((d) => d.id))).all()
+    ? await db.select().from(schema.activities).where(inArray(schema.activities.dayId, preserved.map((d) => d.id)))
     : [];
 
   const allIndexes = Array.from({ length: diffDays(trip.startDate, trip.endDate) + 1 }, (_, i) => i);
@@ -129,38 +128,37 @@ export async function generateItineraryForTrip(
     excludePoiIds: preservedActs.map((a) => a.poiId).filter((x): x is string => !!x),
   });
 
-  db.transaction((tx) => {
+  await db.transaction(async (tx) => {
     let itineraryId = existing?.id;
     if (!itineraryId) {
       itineraryId = crypto.randomUUID();
-      tx.insert(schema.itineraries).values({ id: itineraryId, tripId, pace: ctx.pace, generatedAt: new Date().toISOString() }).run();
+      await tx.insert(schema.itineraries).values({ id: itineraryId, tripId, pace: ctx.pace, generatedAt: new Date().toISOString() });
     } else {
-      tx.update(schema.itineraries).set({ pace: ctx.pace, generatedAt: new Date().toISOString() }).where(eq(schema.itineraries.id, itineraryId)).run();
+      await tx.update(schema.itineraries).set({ pace: ctx.pace, generatedAt: new Date().toISOString() }).where(eq(schema.itineraries.id, itineraryId));
       const toDelete = existingDays.filter((d) => !preservedIdx.has(d.dayIndex)).map((d) => d.id);
-      if (toDelete.length) tx.delete(schema.itineraryDays).where(inArray(schema.itineraryDays.id, toDelete)).run();
+      if (toDelete.length) await tx.delete(schema.itineraryDays).where(inArray(schema.itineraryDays.id, toDelete));
     }
     for (const day of drafts) {
       const dayId = crypto.randomUUID();
-      tx.insert(schema.itineraryDays).values({ id: dayId, itineraryId, dayIndex: day.dayIndex, date: day.date, title: day.title }).run();
-      insertDraftActivities(tx, dayId, day.activities);
+      await tx.insert(schema.itineraryDays).values({ id: dayId, itineraryId, dayIndex: day.dayIndex, date: day.date, title: day.title });
+      await insertDraftActivities(tx, dayId, day.activities);
     }
   });
-  touchTrip(tripId);
+  await touchTrip(tripId);
   return { itinerary: (await loadItinerary(tripId))!, preservedDays: preserved.length };
 }
 
 /** Rigenera una sola giornata. Le attività toccate dall'utente restano ferme; i POI degli altri giorni sono esclusi. */
 export async function regenerateDay(userId: string, tripId: string, dayId: string, opts: { pace?: TripPace } = {}): Promise<Itinerary> {
-  const trip = getOwnedTripRow(userId, tripId);
-  const { day, itinerary } = getOwnedDay(tripId, dayId);
+  const trip = await getOwnedTripRow(userId, tripId);
+  const { day, itinerary } = await getOwnedDay(tripId, dayId);
   const ctx = await buildContext(trip, userId, opts.pace);
-  const allDays = db.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itinerary.id)).all();
-  const otherActs = db
+  const allDays = await db.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itinerary.id));
+  const otherActs = await db
     .select()
     .from(schema.activities)
-    .where(inArray(schema.activities.dayId, allDays.filter((d) => d.id !== dayId).map((d) => d.id).concat("__none__")))
-    .all();
-  const dayActs = db.select().from(schema.activities).where(eq(schema.activities.dayId, dayId)).all();
+    .where(inArray(schema.activities.dayId, allDays.filter((d) => d.id !== dayId).map((d) => d.id).concat("__none__")));
+  const dayActs = await db.select().from(schema.activities).where(eq(schema.activities.dayId, dayId));
   const fixed = dayActs.filter((a) => a.isUserModified || a.source === "user");
 
   const [draft] = generateItinerary({
@@ -170,63 +168,63 @@ export async function regenerateDay(userId: string, tripId: string, dayId: strin
     fixedByDay: { [day.dayIndex]: fixed.map(rowToDraft) },
   });
 
-  db.transaction((tx) => {
-    tx.delete(schema.activities).where(eq(schema.activities.dayId, dayId)).run();
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.activities).where(eq(schema.activities.dayId, dayId));
     // Le attività fisse tornano con la loro identità e i loro flag
     const fixedByKey = new Map(fixed.map((a) => [`${a.title}|${a.startTime}`, a]));
-    draft.activities.forEach((a, i) => {
+    for (const [i, a] of draft.activities.entries()) {
       const keep = fixedByKey.get(`${a.title}|${a.startTime}`);
-      if (keep) tx.insert(schema.activities).values({ ...keep, position: i }).run();
-      else insertDraftActivities(tx, dayId, [a]);
-    });
+      if (keep) await tx.insert(schema.activities).values({ ...keep, position: i });
+      else await insertDraftActivities(tx, dayId, [a]);
+    }
     // insertDraftActivities usa posizione 0: riallinea l'ordine per orario
-    const rows = tx.select().from(schema.activities).where(eq(schema.activities.dayId, dayId)).all();
+    const rows = await tx.select().from(schema.activities).where(eq(schema.activities.dayId, dayId));
     rows.sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
-    rows.forEach((r, i) => tx.update(schema.activities).set({ position: i }).where(eq(schema.activities.id, r.id)).run());
-    tx.update(schema.itineraryDays).set({ title: draft.title, isUserModified: fixed.length > 0 }).where(eq(schema.itineraryDays.id, dayId)).run();
+    for (const [i, r] of rows.entries()) await tx.update(schema.activities).set({ position: i }).where(eq(schema.activities.id, r.id));
+    await tx.update(schema.itineraryDays).set({ title: draft.title, isUserModified: fixed.length > 0 }).where(eq(schema.itineraryDays.id, dayId));
   });
-  touchTrip(tripId);
+  await touchTrip(tripId);
   return (await loadItinerary(tripId))!;
 }
 
 // ───────── Modifiche manuali ─────────
 
-function getOwnedDay(tripId: string, dayId: string) {
-  const row = db
+async function getOwnedDay(tripId: string, dayId: string) {
+  const row = await db
     .select({ day: schema.itineraryDays, itinerary: schema.itineraries })
     .from(schema.itineraryDays)
     .innerJoin(schema.itineraries, eq(schema.itineraries.id, schema.itineraryDays.itineraryId))
     .where(and(eq(schema.itineraryDays.id, dayId), eq(schema.itineraries.tripId, tripId)))
-    .get();
+    .limit(1).then((r) => r[0]);
   if (!row) throw notFound("Giornata");
   return row;
 }
 
-function getOwnedActivity(tripId: string, activityId: string) {
-  const row = db
+async function getOwnedActivity(tripId: string, activityId: string) {
+  const row = await db
     .select({ activity: schema.activities, day: schema.itineraryDays })
     .from(schema.activities)
     .innerJoin(schema.itineraryDays, eq(schema.itineraryDays.id, schema.activities.dayId))
     .innerJoin(schema.itineraries, eq(schema.itineraries.id, schema.itineraryDays.itineraryId))
     .where(and(eq(schema.activities.id, activityId), eq(schema.itineraries.tripId, tripId)))
-    .get();
+    .limit(1).then((r) => r[0]);
   if (!row) throw notFound("Attività");
   return row;
 }
 
 /** Ricalcola gli orari di una giornata (stessa funzione usata dal client) e salva posizioni e orari. */
-function persistReflow(tx: Tx, dayId: string, orderedIds?: string[], dayStart?: string) {
-  const rows = tx.select().from(schema.activities).where(eq(schema.activities.dayId, dayId)).all();
+async function persistReflow(tx: Tx, dayId: string, orderedIds?: string[], dayStart?: string) {
+  const rows = await tx.select().from(schema.activities).where(eq(schema.activities.dayId, dayId));
   const ordered = orderedIds
     ? orderedIds.map((id) => rows.find((r) => r.id === id)).filter((r): r is ActivityRow => !!r)
     : rows.sort((a, b) => a.position - b.position);
   const start = dayStart ?? (ordered.length ? ordered.reduce((m, r) => (r.startTime < m ? r.startTime : m), ordered[0].startTime) : undefined);
   const reflowed = reflowDay(ordered.map((r) => ({ ...r, travelMinFromPrev: null })), start);
-  reflowed.forEach((r, i) => tx.update(schema.activities).set({ position: i, startTime: r.startTime }).where(eq(schema.activities.id, r.id)).run());
+  for (const [i, r] of reflowed.entries()) await tx.update(schema.activities).set({ position: i, startTime: r.startTime }).where(eq(schema.activities.id, r.id));
 }
 
-function markDayModified(tx: Tx, dayId: string) {
-  tx.update(schema.itineraryDays).set({ isUserModified: true }).where(eq(schema.itineraryDays.id, dayId)).run();
+async function markDayModified(tx: Tx, dayId: string) {
+  await tx.update(schema.itineraryDays).set({ isUserModified: true }).where(eq(schema.itineraryDays.id, dayId));
 }
 
 export async function createActivity(
@@ -235,39 +233,38 @@ export async function createActivity(
   raw: z.input<typeof activityInputSchema>,
   source: "user" | "assistant" = "user",
 ): Promise<Itinerary> {
-  getOwnedTripRow(userId, tripId);
+  await getOwnedTripRow(userId, tripId);
   const input = activityInputSchema.parse(raw);
-  getOwnedDay(tripId, input.dayId);
-  db.transaction((tx) => {
-    const existing = tx.select().from(schema.activities).where(eq(schema.activities.dayId, input.dayId)).all();
-    tx.insert(schema.activities)
+  await getOwnedDay(tripId, input.dayId);
+  await db.transaction(async (tx) => {
+    const existing = await tx.select().from(schema.activities).where(eq(schema.activities.dayId, input.dayId));
+    await tx.insert(schema.activities)
       .values({
         dayId: input.dayId, position: existing.length, title: input.title, category: input.category, startTime: input.startTime,
         durationMin: input.durationMin, placeName: input.placeName ?? null, lat: input.lat ?? null, lng: input.lng ?? null,
         cost: input.cost, notes: input.notes ?? null, poiId: input.poiId ?? null, source, isUserModified: true,
         timeLocked: input.timeLocked ?? false,
-      })
-      .run();
+      });
     // Inserimento in ordine cronologico
-    const all = tx.select().from(schema.activities).where(eq(schema.activities.dayId, input.dayId)).all();
+    const all = await tx.select().from(schema.activities).where(eq(schema.activities.dayId, input.dayId));
     all.sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime) || a.position - b.position);
-    all.forEach((r, i) => tx.update(schema.activities).set({ position: i }).where(eq(schema.activities.id, r.id)).run());
-    markDayModified(tx, input.dayId);
+    for (const [i, r] of all.entries()) await tx.update(schema.activities).set({ position: i }).where(eq(schema.activities.id, r.id));
+    await markDayModified(tx, input.dayId);
   });
-  touchTrip(tripId);
+  await touchTrip(tripId);
   return (await loadItinerary(tripId))!;
 }
 
 export async function updateActivity(userId: string, tripId: string, activityId: string, raw: z.input<typeof activityPatchSchema>): Promise<Itinerary> {
-  getOwnedTripRow(userId, tripId);
+  await getOwnedTripRow(userId, tripId);
   const patch = activityPatchSchema.parse(raw);
-  const { activity, day } = getOwnedActivity(tripId, activityId);
+  const { activity, day } = await getOwnedActivity(tripId, activityId);
   const targetDayId = patch.dayId ?? activity.dayId;
-  if (targetDayId !== activity.dayId) getOwnedDay(tripId, targetDayId);
+  if (targetDayId !== activity.dayId) await getOwnedDay(tripId, targetDayId);
 
-  db.transaction((tx) => {
+  await db.transaction(async (tx) => {
     const timeChanged = patch.startTime !== undefined && patch.startTime !== activity.startTime;
-    tx.update(schema.activities)
+    await tx.update(schema.activities)
       .set({
         ...("title" in patch && { title: patch.title }),
         ...("category" in patch && { category: patch.category }),
@@ -284,43 +281,42 @@ export async function updateActivity(userId: string, tripId: string, activityId:
         // Cambiare l'orario a mano lo "fissa", a meno che l'utente non lo sblocchi esplicitamente
         timeLocked: patch.timeLocked ?? (timeChanged ? true : activity.timeLocked),
       })
-      .where(eq(schema.activities.id, activityId))
-      .run();
+      .where(eq(schema.activities.id, activityId));
 
     if (timeChanged) {
-      const rows = tx.select().from(schema.activities).where(eq(schema.activities.dayId, targetDayId)).all();
+      const rows = await tx.select().from(schema.activities).where(eq(schema.activities.dayId, targetDayId));
       rows.sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
-      persistReflow(tx, targetDayId, rows.map((r) => r.id));
+      await persistReflow(tx, targetDayId, rows.map((r) => r.id));
     } else {
-      persistReflow(tx, targetDayId);
+      await persistReflow(tx, targetDayId);
     }
-    markDayModified(tx, targetDayId);
+    await markDayModified(tx, targetDayId);
     if (targetDayId !== day.id) {
-      persistReflow(tx, day.id);
-      markDayModified(tx, day.id);
+      await persistReflow(tx, day.id);
+      await markDayModified(tx, day.id);
     }
   });
-  touchTrip(tripId);
+  await touchTrip(tripId);
   return (await loadItinerary(tripId))!;
 }
 
 export async function deleteActivity(userId: string, tripId: string, activityId: string): Promise<Itinerary> {
-  getOwnedTripRow(userId, tripId);
-  const { day } = getOwnedActivity(tripId, activityId);
-  db.transaction((tx) => {
-    tx.delete(schema.activities).where(eq(schema.activities.id, activityId)).run();
+  await getOwnedTripRow(userId, tripId);
+  const { day } = await getOwnedActivity(tripId, activityId);
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.activities).where(eq(schema.activities.id, activityId));
     // Non ricalcoliamo gli orari: togliere una tappa lascia tempo libero, non sposta le altre
-    const rest = tx.select().from(schema.activities).where(eq(schema.activities.dayId, day.id)).all().sort((a, b) => a.position - b.position);
-    rest.forEach((r, i) => tx.update(schema.activities).set({ position: i }).where(eq(schema.activities.id, r.id)).run());
-    markDayModified(tx, day.id);
+    const rest = (await tx.select().from(schema.activities).where(eq(schema.activities.dayId, day.id))).sort((a, b) => a.position - b.position);
+    for (const [i, r] of rest.entries()) await tx.update(schema.activities).set({ position: i }).where(eq(schema.activities.id, r.id));
+    await markDayModified(tx, day.id);
   });
-  touchTrip(tripId);
+  await touchTrip(tripId);
   return (await loadItinerary(tripId))!;
 }
 
 /** Drag & drop: nuovo ordine (anche tra giornate diverse) + ricalcolo orari delle giornate toccate. */
 export async function reorderItinerary(userId: string, tripId: string, raw: z.input<typeof reorderSchema>): Promise<Itinerary> {
-  getOwnedTripRow(userId, tripId);
+  await getOwnedTripRow(userId, tripId);
   const { days } = reorderSchema.parse(raw);
   const itinerary = await loadItinerary(tripId);
   if (!itinerary) throw notFound("Itinerario");
@@ -331,26 +327,26 @@ export async function reorderItinerary(userId: string, tripId: string, raw: z.in
     for (const id of d.activityIds) if (!validActivities.has(id)) throw notFound("Attività");
   }
 
-  db.transaction((tx) => {
+  await db.transaction(async (tx) => {
     for (const d of days) {
       const before = validDays.get(d.dayId)!;
       const changed = before.activities.map((a) => a.id).join() !== d.activityIds.join();
       if (!changed) continue;
-      for (const id of d.activityIds) tx.update(schema.activities).set({ dayId: d.dayId }).where(eq(schema.activities.id, id)).run();
+      for (const id of d.activityIds) await tx.update(schema.activities).set({ dayId: d.dayId }).where(eq(schema.activities.id, id));
       const moved = d.activityIds.filter((id) => validActivities.get(id)!.dayId !== d.dayId);
-      if (moved.length) tx.update(schema.activities).set({ isUserModified: true }).where(inArray(schema.activities.id, moved)).run();
-      persistReflow(tx, d.dayId, d.activityIds, before.activities[0]?.startTime);
-      markDayModified(tx, d.dayId);
+      if (moved.length) await tx.update(schema.activities).set({ isUserModified: true }).where(inArray(schema.activities.id, moved));
+      await persistReflow(tx, d.dayId, d.activityIds, before.activities[0]?.startTime);
+      await markDayModified(tx, d.dayId);
     }
   });
-  touchTrip(tripId);
+  await touchTrip(tripId);
   return (await loadItinerary(tripId))!;
 }
 
 export async function renameDay(userId: string, tripId: string, dayId: string, title: string): Promise<void> {
-  getOwnedTripRow(userId, tripId);
-  getOwnedDay(tripId, dayId);
+  await getOwnedTripRow(userId, tripId);
+  await getOwnedDay(tripId, dayId);
   const clean = title.trim().slice(0, 80);
   if (!clean) throw new AppError("validation", "Il titolo non può essere vuoto");
-  db.update(schema.itineraryDays).set({ title: clean, isUserModified: true }).where(eq(schema.itineraryDays.id, dayId)).run();
+  await db.update(schema.itineraryDays).set({ title: clean, isUserModified: true }).where(eq(schema.itineraryDays.id, dayId));
 }

@@ -24,13 +24,13 @@ export async function bookingOptionsForOffer(kind: BookingKind, offerId: string)
 
 /** Venditori per un volo o un alloggio già salvato in un viaggio dell'utente. */
 export async function bookingOptionsForTripItem(userId: string, tripId: string, kind: BookingKind, itemId: string): Promise<BookingOption[]> {
-  getOwnedTripRow(userId, tripId);
+  await getOwnedTripRow(userId, tripId);
   if (kind === "flight") {
-    const row = db.select().from(schema.tripFlights).where(and(eq(schema.tripFlights.id, itemId), eq(schema.tripFlights.tripId, tripId))).get();
+    const [row] = await db.select().from(schema.tripFlights).where(and(eq(schema.tripFlights.id, itemId), eq(schema.tripFlights.tripId, tripId))).limit(1);
     if (!row) throw new AppError("not_found", "Volo non trovato");
     return optionsFor(kind, row.bookingRef);
   }
-  const row = db.select().from(schema.tripAccommodations).where(and(eq(schema.tripAccommodations.id, itemId), eq(schema.tripAccommodations.tripId, tripId))).get();
+  const [row] = await db.select().from(schema.tripAccommodations).where(and(eq(schema.tripAccommodations.id, itemId), eq(schema.tripAccommodations.tripId, tripId))).limit(1);
   if (!row) throw new AppError("not_found", "Alloggio non trovato");
   return optionsFor(kind, row.bookingRef);
 }

@@ -1,10 +1,10 @@
 /**
- * Schema relazionale (Drizzle, dialetto SQLite per lo sviluppo).
- * Per PostgreSQL: stesso modello con `drizzle-orm/pg-core` (text→text, integer→integer,
- * real→doublePrecision, json→jsonb). I servizi non usano funzioni specifiche di SQLite.
+ * Schema relazionale (Drizzle, PostgreSQL). In produzione gira su Postgres (es. Neon su Vercel),
+ * in sviluppo su PGlite: lo stesso motore, in un file locale, senza installare nulla.
+ * Date e orari restano stringhe ISO (come nel resto dell'app), così nessun servizio dipende dai fusi del database.
  */
 import { relations, sql } from "drizzle-orm";
-import { index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { boolean, doublePrecision, index, integer, jsonb, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
 import type {
   AccommodationType,
   BookingRef,
@@ -16,16 +16,16 @@ import type {
 } from "@/lib/types";
 
 const id = () => text("id").primaryKey().$defaultFn(() => crypto.randomUUID());
-const createdAt = () => text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`);
+const createdAt = () => text("created_at").notNull().default(sql`to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`);
 const updatedAt = () =>
   text("updated_at")
     .notNull()
-    .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
+    .default(sql`to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`)
     .$onUpdateFn(() => new Date().toISOString());
 
 // ───────────────────────────── Utenti e autenticazione ─────────────────────────────
 
-export const users = sqliteTable("users", {
+export const users = pgTable("users", {
   id: id(),
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
@@ -35,7 +35,7 @@ export const users = sqliteTable("users", {
   updatedAt: updatedAt(),
 });
 
-export const sessions = sqliteTable(
+export const sessions = pgTable(
   "sessions",
   {
     /** SHA-256 del token: il token in chiaro esiste solo nel cookie */
@@ -47,7 +47,7 @@ export const sessions = sqliteTable(
   (t) => [index("sessions_user_idx").on(t.userId)],
 );
 
-export const passwordResetTokens = sqliteTable("password_reset_tokens", {
+export const passwordResetTokens = pgTable("password_reset_tokens", {
   id: id(),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   tokenHash: text("token_hash").notNull().unique(),
@@ -56,16 +56,16 @@ export const passwordResetTokens = sqliteTable("password_reset_tokens", {
   createdAt: createdAt(),
 });
 
-export const preferences = sqliteTable("preferences", {
+export const preferences = pgTable("preferences", {
   userId: text("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
   pace: text("pace").$type<TripPace>().notNull().default("bilanciato"),
-  interests: text("interests", { mode: "json" }).$type<string[]>().notNull().default(sql`'[]'`),
+  interests: jsonb("interests").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
   budgetLevel: text("budget_level").$type<"basso" | "medio" | "alto">().notNull().default("medio"),
 });
 
 // ───────────────────────────── Viaggi ─────────────────────────────
 
-export const trips = sqliteTable(
+export const trips = pgTable(
   "trips",
   {
     id: id(),
@@ -76,8 +76,8 @@ export const trips = sqliteTable(
     destinationName: text("destination_name").notNull(),
     country: text("country").notNull(),
     countryCode: text("country_code").notNull(),
-    destinationLat: real("destination_lat").notNull(),
-    destinationLng: real("destination_lng").notNull(),
+    destinationLat: doublePrecision("destination_lat").notNull(),
+    destinationLng: doublePrecision("destination_lng").notNull(),
     imageUrl: text("image_url").notNull(),
     originCode: text("origin_code"),
     startDate: text("start_date").notNull(),
@@ -93,16 +93,16 @@ export const trips = sqliteTable(
   (t) => [index("trips_user_idx").on(t.userId)],
 );
 
-export const travelers = sqliteTable("travelers", {
+export const travelers = pgTable("travelers", {
   id: id(),
   tripId: text("trip_id").notNull().references(() => trips.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email"),
-  isOwner: integer("is_owner", { mode: "boolean" }).notNull().default(false),
+  isOwner: boolean("is_owner").notNull().default(false),
 });
 
 /** Flight: snapshot dell'offerta scelta (andata o ritorno) */
-export const tripFlights = sqliteTable("trip_flights", {
+export const tripFlights = pgTable("trip_flights", {
   id: id(),
   tripId: text("trip_id").notNull().references(() => trips.id, { onDelete: "cascade" }),
   direction: text("direction").$type<"andata" | "ritorno">().notNull(),
@@ -118,15 +118,15 @@ export const tripFlights = sqliteTable("trip_flights", {
   durationMin: integer("duration_min").notNull(),
   stops: integer("stops").notNull(),
   pricePerPerson: integer("price_per_person").notNull(),
-  baggage: text("baggage", { mode: "json" }).$type<{ cabin: boolean | null; checked: boolean | null }>().notNull(),
-  conditions: text("conditions", { mode: "json" }).$type<string[]>().notNull(),
+  baggage: jsonb("baggage").$type<{ cabin: boolean | null; checked: boolean | null }>().notNull(),
+  conditions: jsonb("conditions").$type<string[]>().notNull(),
   /** Per riaprire i link di prenotazione dal viaggio salvato (può scadere lato provider) */
-  bookingRef: text("booking_ref", { mode: "json" }).$type<BookingRef | null>(),
+  bookingRef: jsonb("booking_ref").$type<BookingRef | null>(),
   createdAt: createdAt(),
 });
 
 /** Accommodation: snapshot dell'alloggio scelto */
-export const tripAccommodations = sqliteTable("trip_accommodations", {
+export const tripAccommodations = pgTable("trip_accommodations", {
   id: id(),
   tripId: text("trip_id").notNull().references(() => trips.id, { onDelete: "cascade" }),
   provider: text("provider").notNull(),
@@ -134,30 +134,30 @@ export const tripAccommodations = sqliteTable("trip_accommodations", {
   name: text("name").notNull(),
   type: text("type").$type<AccommodationType>().notNull(),
   neighborhood: text("neighborhood").notNull(),
-  lat: real("lat").notNull(),
-  lng: real("lng").notNull(),
-  rating: real("rating").notNull(),
+  lat: doublePrecision("lat").notNull(),
+  lng: doublePrecision("lng").notNull(),
+  rating: doublePrecision("rating").notNull(),
   reviewsCount: integer("reviews_count").notNull(),
   pricePerNight: integer("price_per_night").notNull(),
   priceTotal: integer("price_total").notNull(),
   checkIn: text("check_in").notNull(),
   checkOut: text("check_out").notNull(),
-  freeCancellation: integer("free_cancellation", { mode: "boolean" }).notNull(),
+  freeCancellation: boolean("free_cancellation").notNull(),
   imageUrl: text("image_url").notNull(),
-  bookingRef: text("booking_ref", { mode: "json" }).$type<BookingRef | null>(),
+  bookingRef: jsonb("booking_ref").$type<BookingRef | null>(),
   createdAt: createdAt(),
 });
 
 // ───────────────────────────── Itinerario ─────────────────────────────
 
-export const itineraries = sqliteTable("itineraries", {
+export const itineraries = pgTable("itineraries", {
   id: id(),
   tripId: text("trip_id").notNull().unique().references(() => trips.id, { onDelete: "cascade" }),
   pace: text("pace").$type<TripPace>().notNull(),
   generatedAt: text("generated_at").notNull(),
 });
 
-export const itineraryDays = sqliteTable(
+export const itineraryDays = pgTable(
   "itinerary_days",
   {
     id: id(),
@@ -166,12 +166,12 @@ export const itineraryDays = sqliteTable(
     date: text("date").notNull(),
     title: text("title").notNull(),
     /** Giornata toccata a mano: la rigenerazione completa la lascia invariata */
-    isUserModified: integer("is_user_modified", { mode: "boolean" }).notNull().default(false),
+    isUserModified: boolean("is_user_modified").notNull().default(false),
   },
   (t) => [uniqueIndex("days_itinerary_index_idx").on(t.itineraryId, t.dayIndex)],
 );
 
-export const activities = sqliteTable(
+export const activities = pgTable(
   "activities",
   {
     id: id(),
@@ -182,15 +182,15 @@ export const activities = sqliteTable(
     startTime: text("start_time").notNull(),
     durationMin: integer("duration_min").notNull(),
     placeName: text("place_name"),
-    lat: real("lat"),
-    lng: real("lng"),
-    cost: real("cost").notNull().default(0),
+    lat: doublePrecision("lat"),
+    lng: doublePrecision("lng"),
+    cost: doublePrecision("cost").notNull().default(0),
     notes: text("notes"),
     poiId: text("poi_id"),
     source: text("source").$type<ActivitySource>().notNull().default("generated"),
-    isUserModified: integer("is_user_modified", { mode: "boolean" }).notNull().default(false),
+    isUserModified: boolean("is_user_modified").notNull().default(false),
     /** Orario fissato a mano: il ricalcolo automatico non lo sposta */
-    timeLocked: integer("time_locked", { mode: "boolean" }).notNull().default(false),
+    timeLocked: boolean("time_locked").notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [index("activities_day_idx").on(t.dayId)],
@@ -198,7 +198,7 @@ export const activities = sqliteTable(
 
 // ───────────────────────────── Prenotazioni e spese ─────────────────────────────
 
-export const bookings = sqliteTable("bookings", {
+export const bookings = pgTable("bookings", {
   id: id(),
   tripId: text("trip_id").notNull().references(() => trips.id, { onDelete: "cascade" }),
   kind: text("kind").$type<"volo" | "alloggio" | "attivita">().notNull(),
@@ -209,14 +209,14 @@ export const bookings = sqliteTable("bookings", {
   createdAt: createdAt(),
 });
 
-export const expenses = sqliteTable(
+export const expenses = pgTable(
   "expenses",
   {
     id: id(),
     tripId: text("trip_id").notNull().references(() => trips.id, { onDelete: "cascade" }),
     category: text("category").$type<ExpenseCategory>().notNull(),
     label: text("label").notNull(),
-    amount: real("amount").notNull(),
+    amount: doublePrecision("amount").notNull(),
     spentAt: text("spent_at"),
     createdAt: createdAt(),
   },
@@ -229,7 +229,7 @@ export const expenses = sqliteTable(
  * Cache persistente delle risposte dei provider a pagamento (e delle offerte, per poterle rileggere
  * dopo il login). Sopravvive ai riavvii: ogni ricerca risparmiata è quota risparmiata.
  */
-export const providerCache = sqliteTable("provider_cache", {
+export const providerCache = pgTable("provider_cache", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
   expiresAt: text("expires_at").notNull(),
@@ -237,7 +237,7 @@ export const providerCache = sqliteTable("provider_cache", {
 });
 
 /** Ricerche effettivamente inviate a un provider, per mese (es. "serpapi:2026-10"). */
-export const providerUsage = sqliteTable("provider_usage", {
+export const providerUsage = pgTable("provider_usage", {
   period: text("period").primaryKey(),
   count: integer("count").notNull().default(0),
 });

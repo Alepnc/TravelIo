@@ -40,12 +40,12 @@ export class SerpApiFlightProvider implements FlightProvider {
 
     const offers = parseFlightResults(res.json, { from: from.code, to: to.code, fromCity: from.city, toCity: to.city, date: query.date, fetchedAt: res.fetchedAt });
     // Le offerte restano rileggibili (per id) mentre l'utente accede e salva il viaggio
-    for (const o of offers) cacheSet(`offer:${o.id}`, o, OFFER_TTL_MS);
+    await Promise.all(offers.map((o) => cacheSet(`offer:${o.id}`, o, OFFER_TTL_MS)));
     return offers;
   }
 
   async getOffer(offerId: string): Promise<FlightOffer | null> {
-    return cacheGet<FlightOffer>(`offer:${offerId}`)?.value ?? null;
+    return (await cacheGet<FlightOffer>(`offer:${offerId}`))?.value ?? null;
   }
 
   async quoteRoundTrip(q: RoundTripQuoteQuery, opts: { cacheOnly: boolean }): Promise<RoundTripQuote> {

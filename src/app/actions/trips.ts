@@ -53,20 +53,20 @@ export async function updateTripAction(tripId: string, _: FormState, form: FormD
 
 export async function deleteTripAction(tripId: string) {
   const user = await requireUser();
-  deleteTrip(user.id, tripId);
+  await deleteTrip(user.id, tripId);
   revalidatePath("/viaggi");
 }
 
 export async function duplicateTripAction(tripId: string) {
   const user = await requireUser();
-  const id = duplicateTrip(user.id, tripId);
+  const id = await duplicateTrip(user.id, tripId);
   revalidatePath("/viaggi");
   return id;
 }
 
 export async function setTripStatusAction(tripId: string, status: TripStatus) {
   const user = await requireUser();
-  setTripStatus(user.id, tripId, tripStatusSchema.parse(status));
+  await setTripStatus(user.id, tripId, tripStatusSchema.parse(status));
   revalidatePath(`/viaggi/${tripId}`);
   revalidatePath("/viaggi");
 }

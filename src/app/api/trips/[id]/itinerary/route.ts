@@ -6,7 +6,7 @@ import { getOwnedTripRow } from "@/server/services/ownership";
 
 export const GET = route<{ id: string }>(async (_req, { id }) => {
   const user = await requireApiUser();
-  getOwnedTripRow(user.id, id);
+  await getOwnedTripRow(user.id, id);
   return { itinerary: await loadItinerary(id) };
 });
 

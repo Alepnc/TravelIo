@@ -18,7 +18,7 @@ export function sha256(value: string): string {
 export async function createSession(userId: string): Promise<void> {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 86_400_000);
-  db.insert(schema.sessions).values({ id: sha256(token), userId, expiresAt: expiresAt.toISOString() }).run();
+  await db.insert(schema.sessions).values({ id: sha256(token), userId, expiresAt: expiresAt.toISOString() });
   const jar = await cookies();
   jar.set(SESSION_COOKIE, token, {
     httpOnly: true,
@@ -32,7 +32,7 @@ export async function createSession(userId: string): Promise<void> {
 export async function destroySession(): Promise<void> {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
-  if (token) db.delete(schema.sessions).where(eq(schema.sessions.id, sha256(token))).run();
+  if (token) await db.delete(schema.sessions).where(eq(schema.sessions.id, sha256(token)));
   jar.delete(SESSION_COOKIE);
 }
 
@@ -41,7 +41,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const row = db
+  const [row] = await db
     .select({
       id: schema.users.id,
       email: schema.users.email,
@@ -53,10 +53,10 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     .from(schema.sessions)
     .innerJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
     .where(eq(schema.sessions.id, sha256(token)))
-    .get();
+    .limit(1);
   if (!row) return null;
   if (new Date(row.expiresAt) < new Date()) {
-    db.delete(schema.sessions).where(eq(schema.sessions.id, row.sessionId)).run();
+    await db.delete(schema.sessions).where(eq(schema.sessions.id, row.sessionId));
     return null;
   }
   return { id: row.id, email: row.email, name: row.name, homeAirport: row.homeAirport };

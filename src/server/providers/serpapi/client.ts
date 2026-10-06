@@ -48,13 +48,13 @@ export class SerpApiClient {
   }
 
   /** Risposta già in cache, senza spendere quota. */
-  peek(cacheKey: string): { json: SerpResponse; fetchedAt: string } | null {
-    const hit = cacheGet<SerpResponse>(cacheKey);
+  async peek(cacheKey: string): Promise<{ json: SerpResponse; fetchedAt: string } | null> {
+    const hit = await cacheGet<SerpResponse>(cacheKey);
     return hit ? { json: hit.value, fetchedAt: hit.createdAt } : null;
   }
 
   async search(call: SerpCall): Promise<{ json: SerpResponse; fetchedAt: string } | null> {
-    const hit = this.peek(call.cacheKey);
+    const hit = await this.peek(call.cacheKey);
     if (hit) return hit;
     if (call.cacheOnly) return null;
 
@@ -75,7 +75,7 @@ export class SerpApiClient {
           : "Prezzi reali non disponibili: manca SERPAPI_API_KEY (vedi README, sezione \"Dati reali\").",
       );
     }
-    reserveSearch(call.klass);
+    await reserveSearch(call.klass);
 
     const url = new URL(`${this.baseUrl}/search.json`);
     for (const [k, v] of Object.entries(call.params)) if (v !== undefined && v !== "") url.searchParams.set(k, String(v));
@@ -108,7 +108,7 @@ export class SerpApiClient {
     if (!res.ok) throw new ProviderError("unavailable", "Il servizio prezzi ha risposto con un errore.");
 
     // "Nessun risultato" è una risposta valida: la mettiamo in cache per non pagare di nuovo la stessa ricerca vuota
-    cacheSet(call.cacheKey, json, call.ttlMs);
+    await cacheSet(call.cacheKey, json, call.ttlMs);
     return { json, fetchedAt: new Date().toISOString() };
   }
 }

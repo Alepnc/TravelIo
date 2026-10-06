@@ -1,11 +1,7 @@
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Database temporaneo: cache e quota sono persistenti, quindi i test non devono toccare quello di sviluppo
-const dbFile = path.join(os.tmpdir(), `travelio-test-${process.pid}.db`);
-process.env.DATABASE_URL = `file:${dbFile}`;
+// Database in memoria (PGlite): cache e quota sono persistenti, quindi i test non devono toccare quello di sviluppo
+process.env.DATABASE_URL = "memory://";
 
 type Mods = {
   SerpApiClient: typeof import("./client").SerpApiClient;
@@ -17,14 +13,13 @@ type Mods = {
 let m: Mods;
 
 beforeAll(async () => {
-  fs.rmSync(dbFile, { force: true });
   const [client, dbm, usage, cache] = await Promise.all([import("./client"), import("@/server/db"), import("./usage"), import("@/server/cache/db-cache")]);
   m = { SerpApiClient: client.SerpApiClient, db: dbm.db, schema: dbm.schema, usageThisMonth: usage.usageThisMonth, cacheSet: cache.cacheSet };
 });
 
-beforeEach(() => {
-  m.db.delete(m.schema.providerCache).run();
-  m.db.delete(m.schema.providerUsage).run();
+beforeEach(async () => {
+  await m.db.delete(m.schema.providerCache);
+  await m.db.delete(m.schema.providerUsage);
   delete process.env.SERPAPI_MONTHLY_LIMIT;
 });
 
@@ -37,7 +32,7 @@ describe("SerpApiClient", () => {
     const c = new m.SerpApiClient({ apiKey: "", fetchImpl: fetchImpl as never });
     await expect(c.search(call("k1"))).rejects.toThrow(/SERPAPI_API_KEY/);
     expect(fetchImpl).not.toHaveBeenCalled();
-    expect(m.usageThisMonth().used).toBe(0);
+    expect((await m.usageThisMonth()).used).toBe(0);
   });
 
   it("mette in cache: la stessa ricerca costa una sola volta, anche dopo un riavvio", async () => {
@@ -48,7 +43,7 @@ describe("SerpApiClient", () => {
     const c2 = new m.SerpApiClient({ apiKey: "k", fetchImpl: fetchImpl as never }); // "nuovo processo"
     await c2.search(call("k2"));
     expect(fetchImpl).toHaveBeenCalledTimes(1);
-    expect(m.usageThisMonth().used).toBe(1);
+    expect((await m.usageThisMonth()).used).toBe(1);
   });
 
   it("unisce le richieste identiche in corso", async () => {
@@ -59,7 +54,7 @@ describe("SerpApiClient", () => {
     const c = new m.SerpApiClient({ apiKey: "k", fetchImpl: fetchImpl as never });
     await Promise.all([c.search(call("k3")), c.search(call("k3")), c.search(call("k3"))]);
     expect(fetchImpl).toHaveBeenCalledTimes(1);
-    expect(m.usageThisMonth().used).toBe(1);
+    expect((await m.usageThisMonth()).used).toBe(1);
   });
 
   it("cacheOnly non spende quota e restituisce null se la risposta manca", async () => {
@@ -67,7 +62,7 @@ describe("SerpApiClient", () => {
     const c = new m.SerpApiClient({ apiKey: "k", fetchImpl: fetchImpl as never });
     expect(await c.search(call("k4", { cacheOnly: true }))).toBeNull();
     expect(fetchImpl).not.toHaveBeenCalled();
-    m.cacheSet("k4", { best_flights: [] }, 60_000);
+    await m.cacheSet("k4", { best_flights: [] }, 60_000);
     expect(await c.search(call("k4", { cacheOnly: true }))).not.toBeNull();
   });
 

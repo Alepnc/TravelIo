@@ -41,12 +41,12 @@ export class SerpApiAccommodationProvider implements AccommodationProvider {
     if (!res || isEmptyResult(res.json)) return [];
 
     const offers = parseHotelResults(res.json, { destinationId: dest.id, query: q, center: dest.location, checkIn: query.checkIn, checkOut: query.checkOut, guests: query.guests, fetchedAt: res.fetchedAt });
-    for (const o of offers) cacheSet(`offer:${o.id}`, o, OFFER_TTL_MS);
+    await Promise.all(offers.map((o) => cacheSet(`offer:${o.id}`, o, OFFER_TTL_MS)));
     return offers;
   }
 
   async getOffer(offerId: string): Promise<AccommodationOffer | null> {
-    return cacheGet<AccommodationOffer>(`offer:${offerId}`)?.value ?? null;
+    return (await cacheGet<AccommodationOffer>(`offer:${offerId}`))?.value ?? null;
   }
 
   async getBookingOptions(ref: BookingRef): Promise<BookingOption[]> {

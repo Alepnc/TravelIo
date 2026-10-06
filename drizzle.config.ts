@@ -1,8 +1,8 @@
 import { defineConfig } from "drizzle-kit";
 
+// Solo "generate" (scrive le migrazioni SQL in /drizzle): non serve un database collegato.
 export default defineConfig({
   schema: "./src/server/db/schema.ts",
   out: "./drizzle",
-  dialect: "sqlite",
-  dbCredentials: { url: (process.env.DATABASE_URL ?? "file:./data/travelio.db").replace(/^file:/, "") },
+  dialect: "postgresql",
 });

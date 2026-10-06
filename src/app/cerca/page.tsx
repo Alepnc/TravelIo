@@ -108,7 +108,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/cerca">) 
   let tripId: string | undefined;
   if (typeof raw.trip === "string" && user) {
     try {
-      tripId = getOwnedTripRow(user.id, raw.trip).id;
+      tripId = (await getOwnedTripRow(user.id, raw.trip)).id;
     } catch {
       tripId = undefined;
     }

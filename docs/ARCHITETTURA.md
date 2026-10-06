@@ -110,7 +110,7 @@ assistant/     AssistantPanel, ProposalCard, PromptChips
 
 ## 6. Database schema
 
-Database relazionale (SQLite in sviluppo, PostgreSQL in produzione — vedi §8). ORM: Drizzle.
+Database relazionale PostgreSQL (PGlite in sviluppo, Neon o altro Postgres in produzione, vedi §8). ORM: Drizzle.
 
 ```
 users ─┬─< sessions
@@ -190,7 +190,7 @@ protezione CSRF integrata di Next.js) che chiamano gli stessi servizi.
 |---|---|---|
 | Framework | **Next.js 16 (App Router) + React 19 + TypeScript** | SSR/SSG per SEO delle pagine destinazione, streaming con Suspense, route handlers e server actions nello stesso progetto |
 | Stile | **Tailwind CSS v4** con design token in `@theme` | design system coerente, zero runtime |
-| DB | **SQLite (better-sqlite3) in dev → PostgreSQL in prod** via **Drizzle ORM** | zero setup in locale; Drizzle è tipizzato, senza engine binari, e ha un dialetto pg |
+| DB | **PostgreSQL** via **Drizzle ORM** (postgres-js); in locale PGlite | zero setup in locale; stesso dialetto e stesso driver in sviluppo e in produzione (Vercel + Neon) |
 | Validazione | **zod** | stessi schemi per form, API e output AI |
 | Auth | Sessioni proprie su DB (scrypt, cookie httpOnly) | nessuna dipendenza esterna; sostituibile con Auth.js/Clerk |
 | Dati voli/alloggi | **SerpApi** (Google Flights/Hotels) dietro interfacce `FlightProvider`/`AccommodationProvider` | prezzi reali con link ai venditori senza accordi commerciali; Skyscanner e Amadeus Self-Service non sono più accessibili a progetti piccoli. Cache e quota su DB |
@@ -246,7 +246,7 @@ src/
 | **Qualità dell'itinerario** (orari irrealistici) | Algoritmo deterministico testato: tempi di spostamento, aperture, finestre volo/check-in; l'AI non scrive mai direttamente il DB |
 | **Conflitti tra modifiche manuali e rigenerazione** | Flag `isUserModified` per giornata e attività, `timeLocked` per orari fissati a mano |
 | **AI non affidabile / costi** | Output vincolato a operazioni tipizzate validate con zod, anteprima obbligatoria, rate limit, fallback rule-based |
-| **SQLite non adatto alla concorrenza in produzione** | Drizzle permette il passaggio a PostgreSQL; nessuna query specifica di SQLite nei servizi |
+| **Funzioni serverless e connessioni al database** | connessione "pooled" di Neon, `prepare: false` e poche connessioni per istanza; migrazioni in build, non a runtime |
 | **Mappa pesante su mobile** | Leaflet caricato lazy solo nella pagina itinerario; vista Lista/Mappa alternata su mobile |
 | **Rate limit in memoria** non condiviso tra istanze | Interfaccia sostituibile con Redis/Upstash in produzione |
 | **Immagini esterne** lente o non disponibili | `next/image` con loader del CDN, lazy loading e fallback a gradiente |

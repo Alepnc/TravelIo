@@ -14,6 +14,6 @@ export const POST = route<{ id: string }>(async (req, { id }) => {
 export const DELETE = route<{ id: string }>(async (req, { id }) => {
   const user = await requireApiUser();
   const flightId = z.string().min(1).parse(req.nextUrl.searchParams.get("flightId"));
-  removeFlight(user.id, id, flightId);
+  await removeFlight(user.id, id, flightId);
   return { ok: true };
 });

@@ -44,17 +44,18 @@ export function toSummary(row: TripRow): TripSummary {
   };
 }
 
-export function listTrips(userId: string): TripSummary[] {
-  return db.select().from(schema.trips).where(eq(schema.trips.userId, userId)).orderBy(desc(schema.trips.updatedAt)).all().map(toSummary);
+export async function listTrips(userId: string): Promise<TripSummary[]> {
+  const rows = await db.select().from(schema.trips).where(eq(schema.trips.userId, userId)).orderBy(desc(schema.trips.updatedAt));
+  return rows.map(toSummary);
 }
 
 export async function getTripDetail(userId: string, tripId: string): Promise<TripDetail> {
-  const row = getOwnedTripRow(userId, tripId);
+  const row = await getOwnedTripRow(userId, tripId);
   const [travelerRows, flightRows, stayRow, expenseRows, itinerary, dest] = await Promise.all([
-    db.select().from(schema.travelers).where(eq(schema.travelers.tripId, tripId)).all(),
-    db.select().from(schema.tripFlights).where(eq(schema.tripFlights.tripId, tripId)).all(),
-    db.select().from(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId)).get(),
-    db.select().from(schema.expenses).where(eq(schema.expenses.tripId, tripId)).orderBy(asc(schema.expenses.createdAt)).all(),
+    db.select().from(schema.travelers).where(eq(schema.travelers.tripId, tripId)),
+    db.select().from(schema.tripFlights).where(eq(schema.tripFlights.tripId, tripId)),
+    db.select().from(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId)).limit(1).then((r) => r[0]),
+    db.select().from(schema.expenses).where(eq(schema.expenses.tripId, tripId)).orderBy(asc(schema.expenses.createdAt)),
     loadItinerary(tripId),
     destinations.get(row.destinationId),
   ]);
@@ -99,18 +100,17 @@ export async function createTrip(
   if (!dest) throw new AppError("validation", "Destinazione non valida");
 
   const tripId = crypto.randomUUID();
-  db.transaction((tx) => {
-    tx.insert(schema.trips)
+  await db.transaction(async (tx) => {
+    await tx.insert(schema.trips)
       .values({
         id: tripId, userId: user.id, name: input.name, destinationId: dest.id, destinationName: dest.name, country: dest.country,
         countryCode: dest.countryCode, destinationLat: dest.location.lat, destinationLng: dest.location.lng, imageUrl: dest.imageUrl,
         originCode: input.originCode ?? null, startDate: input.startDate, endDate: input.endDate, travelersCount: input.travelersCount,
         budgetPerPerson: input.budgetPerPerson ?? null, pace: input.pace,
-      })
-      .run();
+      });
     const names = [user.name, ...input.travelerNames.filter(Boolean)].slice(0, input.travelersCount);
     while (names.length < input.travelersCount) names.push(`Viaggiatore ${names.length + 1}`);
-    tx.insert(schema.travelers).values(names.map((name, i) => ({ tripId, name, isOwner: i === 0 }))).run();
+    await tx.insert(schema.travelers).values(names.map((name, i) => ({ tripId, name, isOwner: i === 0 })));
   });
 
   if (rawSelection) {
@@ -126,13 +126,13 @@ export async function createTrip(
 }
 
 export async function updateTrip(userId: string, tripId: string, rawInput: TripInput): Promise<void> {
-  const row = getOwnedTripRow(userId, tripId);
+  const row = await getOwnedTripRow(userId, tripId);
   const input = tripInputSchema.parse(rawInput);
   const dest = input.destinationId === row.destinationId ? null : await destinations.get(input.destinationId);
   if (input.destinationId !== row.destinationId && !dest) throw new AppError("validation", "Destinazione non valida");
 
-  db.transaction((tx) => {
-    tx.update(schema.trips)
+  await db.transaction(async (tx) => {
+    await tx.update(schema.trips)
       .set({
         name: input.name, originCode: input.originCode ?? null, startDate: input.startDate, endDate: input.endDate,
         travelersCount: input.travelersCount, budgetPerPerson: input.budgetPerPerson ?? null, pace: input.pace,
@@ -141,28 +141,26 @@ export async function updateTrip(userId: string, tripId: string, rawInput: TripI
           destinationLat: dest.location.lat, destinationLng: dest.location.lng, imageUrl: dest.imageUrl,
         }),
       })
-      .where(eq(schema.trips.id, tripId))
-      .run();
+      .where(eq(schema.trips.id, tripId));
 
     if (dest) {
       // Nuova destinazione: voli, alloggio e itinerario precedenti non hanno più senso
-      tx.delete(schema.tripFlights).where(eq(schema.tripFlights.tripId, tripId)).run();
-      tx.delete(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId)).run();
-      tx.delete(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).run();
+      await tx.delete(schema.tripFlights).where(eq(schema.tripFlights.tripId, tripId));
+      await tx.delete(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId));
+      await tx.delete(schema.itineraries).where(eq(schema.itineraries.tripId, tripId));
       return;
     }
     if (input.startDate !== row.startDate || input.endDate !== row.endDate) {
-      syncItineraryDays(tx, tripId, input.startDate, input.endDate);
+      await syncItineraryDays(tx, tripId, input.startDate, input.endDate);
     }
     // Allinea il numero di partecipanti
-    const current = tx.select().from(schema.travelers).where(eq(schema.travelers.tripId, tripId)).all();
+    const current = await tx.select().from(schema.travelers).where(eq(schema.travelers.tripId, tripId));
     if (current.length < input.travelersCount) {
-      tx.insert(schema.travelers)
-        .values(Array.from({ length: input.travelersCount - current.length }, (_, i) => ({ tripId, name: `Viaggiatore ${current.length + i + 1}` })))
-        .run();
+      await tx.insert(schema.travelers)
+        .values(Array.from({ length: input.travelersCount - current.length }, (_, i) => ({ tripId, name: `Viaggiatore ${current.length + i + 1}` })));
     } else if (current.length > input.travelersCount) {
       const removable = current.filter((t) => !t.isOwner).slice(input.travelersCount - current.length);
-      if (removable.length) tx.delete(schema.travelers).where(inArray(schema.travelers.id, removable.map((t) => t.id))).run();
+      if (removable.length) await tx.delete(schema.travelers).where(inArray(schema.travelers.id, removable.map((t) => t.id)));
     }
   });
 }
@@ -170,55 +168,55 @@ export async function updateTrip(userId: string, tripId: string, rawInput: TripI
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /** Dopo un cambio date: mantiene le giornate esistenti per indice, aggiunge o rimuove le eccedenti. */
-function syncItineraryDays(tx: Tx, tripId: string, startDate: string, endDate: string) {
-  const itin = tx.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).get();
+async function syncItineraryDays(tx: Tx, tripId: string, startDate: string, endDate: string) {
+  const itin = await tx.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).limit(1).then((r) => r[0]);
   if (!itin) return;
-  const days = tx.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itin.id)).orderBy(asc(schema.itineraryDays.dayIndex)).all();
+  const days = await tx.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itin.id)).orderBy(asc(schema.itineraryDays.dayIndex));
   const total = diffDays(startDate, endDate) + 1;
   for (const d of days) {
-    if (d.dayIndex >= total) tx.delete(schema.itineraryDays).where(eq(schema.itineraryDays.id, d.id)).run();
-    else tx.update(schema.itineraryDays).set({ date: addDays(startDate, d.dayIndex) }).where(eq(schema.itineraryDays.id, d.id)).run();
+    if (d.dayIndex >= total) await tx.delete(schema.itineraryDays).where(eq(schema.itineraryDays.id, d.id));
+    else await tx.update(schema.itineraryDays).set({ date: addDays(startDate, d.dayIndex) }).where(eq(schema.itineraryDays.id, d.id));
   }
   for (let i = days.length; i < total; i++) {
-    tx.insert(schema.itineraryDays).values({ itineraryId: itin.id, dayIndex: i, date: addDays(startDate, i), title: "Giornata libera" }).run();
+    await tx.insert(schema.itineraryDays).values({ itineraryId: itin.id, dayIndex: i, date: addDays(startDate, i), title: "Giornata libera" });
   }
 }
 
-export function setTripStatus(userId: string, tripId: string, status: TripStatus): void {
-  getOwnedTripRow(userId, tripId);
-  db.update(schema.trips).set({ status }).where(eq(schema.trips.id, tripId)).run();
+export async function setTripStatus(userId: string, tripId: string, status: TripStatus): Promise<void> {
+  await getOwnedTripRow(userId, tripId);
+  await db.update(schema.trips).set({ status }).where(eq(schema.trips.id, tripId));
 }
 
-export function deleteTrip(userId: string, tripId: string): void {
-  getOwnedTripRow(userId, tripId);
-  db.delete(schema.trips).where(eq(schema.trips.id, tripId)).run();
+export async function deleteTrip(userId: string, tripId: string): Promise<void> {
+  await getOwnedTripRow(userId, tripId);
+  await db.delete(schema.trips).where(eq(schema.trips.id, tripId));
 }
 
-export function duplicateTrip(userId: string, tripId: string): string {
-  const row = getOwnedTripRow(userId, tripId);
+export async function duplicateTrip(userId: string, tripId: string): Promise<string> {
+  const row = await getOwnedTripRow(userId, tripId);
   const newId = crypto.randomUUID();
-  db.transaction((tx) => {
+  await db.transaction(async (tx) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = row;
-    tx.insert(schema.trips).values({ ...rest, id: newId, name: `${row.name} (copia)`, status: "pianificazione" }).run();
-    for (const t of tx.select().from(schema.travelers).where(eq(schema.travelers.tripId, tripId)).all()) {
-      tx.insert(schema.travelers).values({ ...t, id: crypto.randomUUID(), tripId: newId }).run();
+    await tx.insert(schema.trips).values({ ...rest, id: newId, name: `${row.name} (copia)`, status: "pianificazione" });
+    for (const t of await tx.select().from(schema.travelers).where(eq(schema.travelers.tripId, tripId))) {
+      await tx.insert(schema.travelers).values({ ...t, id: crypto.randomUUID(), tripId: newId });
     }
-    for (const f of tx.select().from(schema.tripFlights).where(eq(schema.tripFlights.tripId, tripId)).all()) {
-      tx.insert(schema.tripFlights).values({ ...f, id: crypto.randomUUID(), tripId: newId }).run();
+    for (const f of await tx.select().from(schema.tripFlights).where(eq(schema.tripFlights.tripId, tripId))) {
+      await tx.insert(schema.tripFlights).values({ ...f, id: crypto.randomUUID(), tripId: newId });
     }
-    for (const a of tx.select().from(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId)).all()) {
-      tx.insert(schema.tripAccommodations).values({ ...a, id: crypto.randomUUID(), tripId: newId }).run();
+    for (const a of await tx.select().from(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId))) {
+      await tx.insert(schema.tripAccommodations).values({ ...a, id: crypto.randomUUID(), tripId: newId });
     }
-    const itin = tx.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).get();
+    const itin = await tx.select().from(schema.itineraries).where(eq(schema.itineraries.tripId, tripId)).limit(1).then((r) => r[0]);
     if (itin) {
       const newItinId = crypto.randomUUID();
-      tx.insert(schema.itineraries).values({ ...itin, id: newItinId, tripId: newId }).run();
-      for (const d of tx.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itin.id)).all()) {
+      await tx.insert(schema.itineraries).values({ ...itin, id: newItinId, tripId: newId });
+      for (const d of await tx.select().from(schema.itineraryDays).where(eq(schema.itineraryDays.itineraryId, itin.id))) {
         const newDayId = crypto.randomUUID();
-        tx.insert(schema.itineraryDays).values({ ...d, id: newDayId, itineraryId: newItinId }).run();
-        const acts = tx.select().from(schema.activities).where(eq(schema.activities.dayId, d.id)).all();
-        if (acts.length) tx.insert(schema.activities).values(acts.map((a) => ({ ...a, id: crypto.randomUUID(), dayId: newDayId }))).run();
+        await tx.insert(schema.itineraryDays).values({ ...d, id: newDayId, itineraryId: newItinId });
+        const acts = await tx.select().from(schema.activities).where(eq(schema.activities.dayId, d.id));
+        if (acts.length) await tx.insert(schema.activities).values(acts.map((a) => ({ ...a, id: crypto.randomUUID(), dayId: newDayId })));
       }
     }
   });
@@ -228,60 +226,58 @@ export function duplicateTrip(userId: string, tripId: string): string {
 // ───────── Voli e alloggio: il prezzo arriva sempre dal provider, mai dal client ─────────
 
 export async function setFlight(userId: string, tripId: string, offerId: string, direction: "andata" | "ritorno"): Promise<void> {
-  getOwnedTripRow(userId, tripId);
+  await getOwnedTripRow(userId, tripId);
   const offer = await flights.getOffer(offerId);
   if (!offer) throw new AppError("not_found", "Questa offerta non è più disponibile. Ripeti la ricerca.");
-  db.transaction((tx) => {
-    tx.delete(schema.tripFlights).where(and(eq(schema.tripFlights.tripId, tripId), eq(schema.tripFlights.direction, direction))).run();
-    tx.insert(schema.tripFlights)
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.tripFlights).where(and(eq(schema.tripFlights.tripId, tripId), eq(schema.tripFlights.direction, direction)));
+    await tx.insert(schema.tripFlights)
       .values({
         tripId, direction, provider: offer.provider, offerId: offer.id, airline: offer.airline, airlineCode: offer.airlineCode,
         flightNumber: offer.flightNumber, fromCode: offer.fromCode, toCode: offer.toCode, departAt: offer.departAt, arriveAt: offer.arriveAt,
         durationMin: offer.durationMin, stops: offer.stops, pricePerPerson: offer.price, baggage: offer.baggage, conditions: offer.conditions,
         bookingRef: offer.bookingRef ?? null,
-      })
-      .run();
-    if (direction === "andata") tx.update(schema.trips).set({ originCode: offer.fromCode }).where(eq(schema.trips.id, tripId)).run();
+      });
+    if (direction === "andata") await tx.update(schema.trips).set({ originCode: offer.fromCode }).where(eq(schema.trips.id, tripId));
   });
 }
 
-export function removeFlight(userId: string, tripId: string, flightId: string): void {
-  getOwnedTripRow(userId, tripId);
-  db.delete(schema.tripFlights).where(and(eq(schema.tripFlights.id, flightId), eq(schema.tripFlights.tripId, tripId))).run();
+export async function removeFlight(userId: string, tripId: string, flightId: string): Promise<void> {
+  await getOwnedTripRow(userId, tripId);
+  await db.delete(schema.tripFlights).where(and(eq(schema.tripFlights.id, flightId), eq(schema.tripFlights.tripId, tripId)));
 }
 
 export async function setAccommodation(userId: string, tripId: string, offerId: string): Promise<void> {
-  getOwnedTripRow(userId, tripId);
+  await getOwnedTripRow(userId, tripId);
   const offer = await accommodations.getOffer(offerId);
   if (!offer) throw new AppError("not_found", "Questa struttura non è più disponibile. Ripeti la ricerca.");
-  db.transaction((tx) => {
-    tx.delete(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId)).run();
-    tx.insert(schema.tripAccommodations)
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId));
+    await tx.insert(schema.tripAccommodations)
       .values({
         tripId, provider: offer.provider, offerId: offer.id, name: offer.name, type: offer.type, neighborhood: offer.neighborhood,
         lat: offer.location.lat, lng: offer.location.lng, rating: offer.rating, reviewsCount: offer.reviewsCount,
         pricePerNight: offer.pricePerNight, priceTotal: offer.priceTotal, checkIn: offer.checkIn, checkOut: offer.checkOut,
         freeCancellation: offer.freeCancellation, imageUrl: offer.imageUrl, bookingRef: offer.bookingRef ?? null,
-      })
-      .run();
+      });
   });
 }
 
-export function removeAccommodation(userId: string, tripId: string): void {
-  getOwnedTripRow(userId, tripId);
-  db.delete(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId)).run();
+export async function removeAccommodation(userId: string, tripId: string): Promise<void> {
+  await getOwnedTripRow(userId, tripId);
+  await db.delete(schema.tripAccommodations).where(eq(schema.tripAccommodations.tripId, tripId));
 }
 
 // ───────── Spese ─────────
 
-export function addExpense(userId: string, tripId: string, raw: z.input<typeof expenseInputSchema>): TripExpense {
-  getOwnedTripRow(userId, tripId);
+export async function addExpense(userId: string, tripId: string, raw: z.input<typeof expenseInputSchema>): Promise<TripExpense> {
+  await getOwnedTripRow(userId, tripId);
   const input = expenseInputSchema.parse(raw);
-  const row = db.insert(schema.expenses).values({ tripId, ...input, spentAt: input.spentAt ?? null }).returning().get();
+  const row = await db.insert(schema.expenses).values({ tripId, ...input, spentAt: input.spentAt ?? null }).returning().then((r) => r[0]);
   return { id: row.id, category: row.category, label: row.label, amount: row.amount, spentAt: row.spentAt };
 }
 
-export function deleteExpense(userId: string, tripId: string, expenseId: string): void {
-  getOwnedTripRow(userId, tripId);
-  db.delete(schema.expenses).where(and(eq(schema.expenses.id, expenseId), eq(schema.expenses.tripId, tripId))).run();
+export async function deleteExpense(userId: string, tripId: string, expenseId: string): Promise<void> {
+  await getOwnedTripRow(userId, tripId);
+  await db.delete(schema.expenses).where(and(eq(schema.expenses.id, expenseId), eq(schema.expenses.tripId, tripId)));
 }

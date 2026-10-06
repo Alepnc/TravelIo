@@ -39,7 +39,7 @@ export default async function TripsPage({ searchParams }: PageProps<"/viaggi">) 
 
   const { stato } = await searchParams;
   const filter = FILTERS.includes(stato as TripStatus) ? (stato as TripStatus) : "tutti";
-  const all = listTrips(user.id);
+  const all = await listTrips(user.id);
   const trips = filter === "tutti" ? all : all.filter((t) => t.status === filter);
 
   return (

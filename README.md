@@ -35,7 +35,8 @@ npm run setup:env            # crea .env.local da .env.example (serve per la chi
 npm run dev                  # http://localhost:3000
 ```
 
-Il database SQLite viene creato in `data/` e migrato automaticamente al primo avvio.
+`npm run dev` avvia anche il database locale: PostgreSQL tramite PGlite, salvato in `data/pglite` ed esposto sulla porta 5433.
+Non serve installare nulla; le migrazioni si applicano all'avvio.
 
 | Comando | |
 |---|---|
@@ -100,7 +101,7 @@ Per usare i dati dimostrativi integrati: `FLIGHT_PROVIDER=mock ACCOMMODATION_PRO
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Drizzle ORM + SQLite (better-sqlite3) · zod ·
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Drizzle ORM + PostgreSQL (postgres-js; PGlite in locale) · zod ·
 @dnd-kit · Leaflet/react-leaflet · Anthropic SDK · sonner · vitest.
 
 ## Struttura
@@ -140,6 +141,15 @@ tramite il loro id (il prezzo non arriva mai dal client) e i link di prenotazion
 - Rate limiting su login, registrazione, recupero password, generazione itinerario e assistente.
 - Nessun segreto nel codice: solo variabili d'ambiente. Header di sicurezza in `next.config.ts`.
 
+## Deploy su Vercel
+
+1. Importa il repository su [vercel.com/new](https://vercel.com/new) (framework: Next.js, impostazioni di default).
+2. **Storage → Marketplace → Neon (Postgres)** e collegalo al progetto: imposta da solo `DATABASE_URL`
+   (e `DATABASE_URL_UNPOOLED`, usata per le migrazioni).
+3. **Settings → Environment Variables**: `SERPAPI_API_KEY`, `SERPAPI_MONTHLY_LIMIT`, `APP_URL` (l'indirizzo pubblico)
+   e, se vuoi l'assistente completo, `ANTHROPIC_API_KEY`.
+4. Deploy. `npm run build` applica le migrazioni a Neon prima di compilare, a ogni deploy.
+
 ## Limiti noti e prossimi passi
 
 - **Prenotazione**: TravelIo non vende né incassa: rimanda al sito del venditore. Nessuna commissione né link affiliato
@@ -157,7 +167,7 @@ tramite il loro id (il prezzo non arriva mai dal client) e i link di prenotazion
   reale (Google Places, OpenTripMap) è il prossimo passo naturale.
 - **Rate limit e cache di breve durata in memoria**: validi per una singola istanza; in produzione usare Redis
   (la cache dei provider e la quota sono già su database).
-- **SQLite** in sviluppo; per la produzione passare a PostgreSQL (dialetto `pg-core` di Drizzle).
+- **Database locale**: PGlite esegue una query alla volta. Va benissimo per sviluppare, non per test di carico.
 - **Rendering dinamico ovunque**: la navbar legge il cookie di sessione nel layout radice. Con `cacheComponents` (PPR)
   le pagine pubbliche, come quelle delle destinazioni, potrebbero diventare statiche.
 - **Email**: il recupero password stampa il link nei log del server finché non si collega un `MailProvider`.

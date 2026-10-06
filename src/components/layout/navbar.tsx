@@ -19,9 +19,9 @@ const USER_LINKS = [
   { href: "/ispirazione", label: "Ispirazione" },
 ];
 
-function notificationsFor(userId: string): AppNotification[] {
+async function notificationsFor(userId: string): Promise<AppNotification[]> {
   const today = todayISO();
-  return listTrips(userId).flatMap((t) => {
+  return (await listTrips(userId)).flatMap((t) => {
     const until = diffDays(today, t.startDate);
     if (until < 0 || until > 30 || t.status === "completato") return [];
     return [
@@ -50,7 +50,7 @@ export async function Navbar() {
               <LinkButton href="/viaggi/nuovo" variant="secondary" size="sm" icon={<Plus className="h-4 w-4" weight="bold" />} className="mr-1 hidden sm:inline-flex">
                 Crea viaggio
               </LinkButton>
-              <NotificationsMenu items={notificationsFor(user.id)} />
+              <NotificationsMenu items={await notificationsFor(user.id)} />
               <UserMenu name={user.name} />
             </>
           ) : (

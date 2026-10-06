@@ -72,7 +72,7 @@ export async function resetPasswordAction(_: FormState, form: FormData): Promise
 export async function updateProfileAction(_: FormState, form: FormData): Promise<FormState> {
   const user = await requireUser("/profilo");
   try {
-    updateProfile(user.id, {
+    await updateProfile(user.id, {
       name: String(form.get("name") ?? ""),
       homeAirport: String(form.get("homeAirport") ?? ""),
       pace: String(form.get("pace") ?? "bilanciato") as "bilanciato",

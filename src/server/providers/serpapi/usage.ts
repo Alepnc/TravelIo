@@ -20,8 +20,8 @@ export function monthlyLimit(): number {
   return Number.isFinite(n) && n > 0 ? n : 250;
 }
 
-export function usageThisMonth(provider = "serpapi"): { used: number; limit: number } {
-  const row = db.select().from(schema.providerUsage).where(eq(schema.providerUsage.period, period(provider))).get();
+export async function usageThisMonth(provider = "serpapi"): Promise<{ used: number; limit: number }> {
+  const [row] = await db.select().from(schema.providerUsage).where(eq(schema.providerUsage.period, period(provider))).limit(1);
   return { used: row?.count ?? 0, limit: monthlyLimit() };
 }
 
@@ -29,11 +29,12 @@ export function usageThisMonth(provider = "serpapi"): { used: number; limit: num
  * Prenota una ricerca sul contatore mensile PRIMA di inviarla (conservativo: meglio contare una ricerca
  * in più che sforare il piano). Lancia ProviderError se il tetto è raggiunto.
  */
-export function reserveSearch(klass: UsageClass, provider = "serpapi"): { used: number; limit: number } {
+export async function reserveSearch(klass: UsageClass, provider = "serpapi"): Promise<{ used: number; limit: number }> {
   const limit = monthlyLimit();
   const key = period(provider);
   const cap = klass === "indicative" ? Math.floor(limit * INDICATIVE_SHARE) : limit;
-  const current = db.select().from(schema.providerUsage).where(eq(schema.providerUsage.period, key)).get()?.count ?? 0;
+  const [currentRow] = await db.select().from(schema.providerUsage).where(eq(schema.providerUsage.period, key)).limit(1);
+  const current = currentRow?.count ?? 0;
   if (current >= cap) {
     throw new ProviderError(
       "unavailable",
@@ -42,11 +43,10 @@ export function reserveSearch(klass: UsageClass, provider = "serpapi"): { used: 
         : "Abbiamo raggiunto il limite mensile di ricerche sui prezzi reali. Riprova il mese prossimo o aumenta il piano.",
     );
   }
-  const row = db
+  const [row] = await db
     .insert(schema.providerUsage)
     .values({ period: key, count: 1 })
     .onConflictDoUpdate({ target: schema.providerUsage.period, set: { count: sql`${schema.providerUsage.count} + 1` } })
-    .returning()
-    .get();
+    .returning();
   return { used: row.count, limit };
 }
